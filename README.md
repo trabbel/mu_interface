@@ -50,3 +50,7 @@ This is a command line tool, where you can send a comment (see user manual) and 
 For some reason the connection with linux is a hack around :D. Maybe we can ask at the work shop for more details or how
 to interact with the MU... there is a script (ctl_for_linux) which works sometimes. Description on how it works you find
 in the source code. 
+
+<br>
+<br>
+Tested the clt_for_linux on my virtual machine seems to work fine. 

@@ -5,13 +5,13 @@ from sys import platform
 if platform == 'win32':  # todo can we generalize this
     p = 'COM5'
 elif platform == 'linux':
-    p = '/dev/ttyACM0',
+    p = '/dev/ttyACM0'
 else:
     print("cannot determine OS!")
     print(platform)
     exit()
 
-
+print('connected to', p)
 
 ser = serial.Serial(
     port=p,
