@@ -53,4 +53,4 @@ in the source code.
 
 <br>
 <br>
-Tested the clt_for_linux on my virtual machine seems to work fine. 
+Tested the clt_for_linux on my virtual machine seems to work fine. If you start everything for the first time you do not need cutecom.. but doesnt work a second time it seems?!? -> for second time you need cutecom and then it works fine again
