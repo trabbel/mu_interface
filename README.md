@@ -10,6 +10,23 @@
    python3 <scriptName>.py
    ```
    
+   ## Thoughts on the linux scripts 
+   For some reason the connection with linux is a hack around.
+
+   to interact with the MU... there is a script (ctl_for_linux) which works sometimes. Description on how it works you find in the source code. 
+
+   <br>
+   <br>
+
+   Tested the clt_for_linux on my virtual machine seems to work fine. If you start everything for the first time you do not need cutecom.. but doesnt work a second time it seems?!? -> for second time you need cutecom and then it works fine again
+
+   <br>
+   <br>
+
+   clt_for_linux2.py works fine (tested on RP4; Linux 20.04). IMPORTANT: You have to follow the instructions inside the source code. (The MU3 needs to be restarted before each try).
+
+   
+   
 # Windows 
 1. Turn on sensor (wait till it beeps).
 2. Go to directory where your code is 
@@ -47,10 +64,5 @@ Port: COM5 (findet man mit device manager)
 This is a command line tool, where you can send a comment (see user manual) and receive the corresponding response. 
 
 # TODO List
-For some reason the connection with linux is a hack around :D. Maybe we can ask at the work shop for more details or how
-to interact with the MU... there is a script (ctl_for_linux) which works sometimes. Description on how it works you find
-in the source code. 
 
-<br>
-<br>
-Tested the clt_for_linux on my virtual machine seems to work fine. If you start everything for the first time you do not need cutecom.. but doesnt work a second time it seems?!? -> for second time you need cutecom and then it works fine again
+Please try the script clt_for_linux2.py. (Follow the instruction inside the script closely. If you do not wait a few seconds/long enough it do not work but idk why!)
