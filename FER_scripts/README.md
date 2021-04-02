@@ -15,5 +15,5 @@ Another feature of this script is the * measure * mode, which will save the meas
 This script will plot the measured temperature. It is here to test the saved data from the * commands_test.py * script.
 
 ### TODO list
-- put each method in a mode other than trying
+- put each method in a try-except form
 - make threads for writing to files, remove * KeyboardInterrupt * exception.
