@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path
 
 def make_file():
-    file_path = '/tmp/watchplant/'
+    file_path = '../tmp/'
     Path(file_path).mkdir(parents=True, exist_ok=True) # make new directory
     file_name = datetime.now().strftime('%H:%M:%S_%d-%m-%Y') + '.txt'
     f = open(file_path + file_name, 'w')
@@ -17,7 +17,10 @@ if __name__ == "__main__":
     try:
         mu = Cybres_MU('/dev/ttyACM1')
     except:
-        mu = Cybres_MU('/dev/ttyACM2')
+        try:
+            mu = Cybres_MU('/dev/ttyACM2')
+        except:
+            mu = Cybres_MU('/dev/ttyACM0')
 
     while True:
         command = input('''\n\nmeasure      -> start measurement and saves it in a file until 'ctrl+c' is pressed

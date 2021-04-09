@@ -1,0 +1,7 @@
+# folders to ignore
+.idea/
+venv/
+tmp/
+
+# files to ignore 
+.DS_Store
