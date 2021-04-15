@@ -25,7 +25,7 @@ class Cybres_MU:
 
 
     def return_serial(self):
-        return self.ser.read(100).decode('ascii')
+        return self.ser.readline().decode('ascii')
 
 
     def restart(self):
