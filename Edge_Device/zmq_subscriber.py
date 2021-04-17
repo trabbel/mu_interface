@@ -7,16 +7,18 @@ class ZMQ_Subscriber():
     def __init__(self):
         context = zmq.Context()
         self.socket = context.socket(zmq.SUB)
-        self.socket.connect("tcp://localhost:5556")
+        self.socket.bind("tcp://*:5556")
         self.socket.subscribe("")
 
 
-    def receive(self):
-        data = self.recv_array()
-        # check if header
-        if len(data) == 1:
-            data = self.socket.recv_string()
-        return data
+    # receive a custom multipart message
+    def receive(self, flags=0, copy=True, track=False):
+        header = self.recv_array(flags=flags)
+        if header[1] == 0:
+            payload = self.socket.recv_string(flags=flags)
+        else:
+            payload = self.recv_array(flags=flags)
+        return header, payload
 
 
     # function for receiving and deserializing np arrays

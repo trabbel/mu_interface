@@ -7,15 +7,16 @@ class ZMQ_Publisher():
     def __init__(self):
         context = zmq.Context()
         self.socket = context.socket(zmq.PUB)
-        self.socket.bind("tcp://*:5556")
+        self.socket.connect("tcp://localhost:5556")
 
 
-    def publish_data(self, data):
-        self.send_array(data)
-
-
-    def publish_header(self, header):
-        self.socket.send_string(header)
+    # function for sending a custom multipart message
+    def publish(self, header, payload, flags=0):
+        self.send_array(header, flags|zmq.SNDMORE)
+        if header[1] == 0:
+            return self.socket.send_string(payload, flags)
+        else:
+            return self.send_array(payload, flags)
 
 
     # function for serializing and sending np arrays

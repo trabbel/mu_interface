@@ -5,7 +5,6 @@ import serial
 class Cybres_MU:
 
     def __init__(self, port_name):
-        # initialization of serial communication
         self.ser = serial.Serial(
             port=port_name,
             baudrate=460800,
@@ -17,8 +16,7 @@ class Cybres_MU:
             rtscts=True,
             dsrdtr=True
         )
-        # here I clean buffer, close and then open serial port again
-        # after these three commands little green blink on MU should be seen
+        
         self.ser.flushInput()
         self.ser.close()
         self.ser.open()
@@ -41,3 +39,10 @@ class Cybres_MU:
     def stop_measurement(self):
         # stop measurement
         self.ser.write(b'mp*')
+
+    
+    def set_measurement_interval(self, interval):
+        # set interval between measurements
+        set_interval = 'mi{:05}*'.format(interval)
+        self.ser.write(set_interval.encode())
+

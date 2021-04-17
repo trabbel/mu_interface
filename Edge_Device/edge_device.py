@@ -8,9 +8,12 @@ class Edge_Device():
 
 
     def start(self):
-        # TODO: Decide on a directory to save the data. On RPI or ITI-server?
-        data = self.sub.receive()
-        print(data)
+        print("receiving")
+        
+        while True:    
+            header, payload = self.sub.receive()
+            print(header)
+            print(payload)
 
 
     def stop(self):
@@ -24,6 +27,6 @@ class Edge_Device():
 
 
     def visualize(self):
-        # TODO: Data diagrams, mathplotlib or gnuplot? Will the ED have a monitor?
+        # TODO: Data diagrams, matplotlib or gnuplot? Will the ED have a monitor?
         # If not, where should the data be shown?
         pass
