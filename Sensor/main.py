@@ -18,6 +18,8 @@ if __name__ == "__main__":
         help="Baudrate for communicating with the measurement unit.")
     parser.add_argument('--int', action='store', type=int, default=10000,
         help="Time interval between two measurements (in miliseconds).")
+    parser.add_argument('--addr', action='store', default='localhost',
+        help='Address of the MQTT subscriber. Can be IP, localhost, *.local, etc.')
     parser.add_argument('--dir', action='store', default='/home/' + os.getenv('USER') + '/measurements/' )
     args = parser.parse_args()
 
@@ -26,7 +28,11 @@ if __name__ == "__main__":
     
     hostname = socket.gethostname()
 
-    SN = Sensor_Node(hostname, args.port, args.baud, args.int, args.dir)
+    csv_dir = args.dir
+    if csv_dir[-1] != '/':
+        csv_dir += '/'
+
+    SN = Sensor_Node(hostname, args.port, args.baud, args.int, args.addr, csv_dir)
     ############################################################
     # SN.mu.restart() TODO: restarting breaks the program, why?
     # After this script gets terminated, the MU has to be 

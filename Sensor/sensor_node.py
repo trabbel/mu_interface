@@ -14,10 +14,10 @@ from Utilities.data2csv import data2csv
 
 class Sensor_Node():
 
-    def __init__(self, hostname, port, baudrate, meas_interval, file_path):
+    def __init__(self, hostname, port, baudrate, meas_interval, address, file_path):
 
         self.mu = Cybres_MU(port, baudrate)
-        self.pub = ZMQ_Publisher()
+        self.pub = ZMQ_Publisher(address)
         self.hostname = hostname
         self.measurment_interval = meas_interval
         self.file_path = file_path

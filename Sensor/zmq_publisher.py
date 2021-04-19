@@ -4,10 +4,10 @@ import numpy as np
 
 class ZMQ_Publisher():
 
-    def __init__(self):
+    def __init__(self, address='localhost'):
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.PUB)
-        self.socket.connect("tcp://localhost:5556")
+        self.socket.connect("tcp://" + address + ":5556")
 
 
     # function for sending a custom multipart message
