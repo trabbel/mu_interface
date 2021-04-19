@@ -1,26 +1,39 @@
 #!/usr/bin/env python3
+import sys
+import re
+import time
+import logging
+import datetime
+import numpy as np
+
 from cybres_mu import Cybres_MU
 from zmq_publisher import ZMQ_Publisher
-import numpy as np
-import logging
-import time, re
+
+sys.path.append("..") # Adds higher directory to python modules path.
+from Utilities.data2csv import data2csv
 
 class Sensor_Node():
 
-    def __init__(self, hostname, port, baudrate, meas_interval):
+    def __init__(self, hostname, port, baudrate, meas_interval, file_path):
 
         self.mu = Cybres_MU(port, baudrate)
         self.pub = ZMQ_Publisher()
         self.hostname = hostname
         self.measurment_interval = meas_interval
+        self.file_path = file_path
+        self.csv_object = None
 
     def start(self):
+        """
+        Start the measurements. Continue to publish over MQTT and store to csv.
+        """
         self.mu.start_measurement()
         time.sleep(0.2)
 
         # Record the starting time and notify the user.
         start_time = datetime.datetime.now()
         logging.info("Measurement started at %s.", start_time.strftime("%d.%m.%Y. %H:%M:%S"))
+        logging.info("Saving data to: %s", self.file_path)
 
         # Send the MU header:
         header = "".join(self.mu.return_serial() for _ in range(8))
@@ -31,7 +44,23 @@ class Sensor_Node():
         # Measure at set interval.
         self.mu.set_measurement_interval(self.measurment_interval)
 
+        # Create the file for storing measurement data.
+        file_name = f"{self.hostname}_{start_time.strftime('%d_%m_%Y-%H_%M_%S')}.csv"
+        self.csv_object = data2csv(self.file_path, file_name)
+        saved = True
+
         while True:
+            # Create a new csv file after the specified interval.
+            current_time = datetime.datetime.now()
+            if current_time.second == 0 and not saved:
+                logging.info("Creating a new csv file.")
+                self.csv_object.close_file()
+                file_name = f"{self.hostname}_{current_time.strftime('%d_%m_%Y-%H_%M_%S')}.csv"
+                self.csv_object = data2csv(self.file_path, file_name)
+                saved = True
+            elif current_time.second != 0:
+                saved = False
+
             # Get the current measurements.
             data = self.mu.return_serial()
         
@@ -41,9 +70,23 @@ class Sensor_Node():
                 header, payload = self.sanitize_input(stripped_data)
                 self.pub.publish(header, payload)
 
+                # Store the data to the csv file.
+                e = self.csv_object.write2csv(stripped_data)
+                if e is not None:
+                    logging.error("Writing to csv file failed with error:\n%s\n\n\
+                        Continuing because this is not a fatal error.", e)
     
     # MU data is in String format and will be transformed in an np array
     def sanitize_input(self, mu_data):
+        """
+        Transform MU data from string to numpy array.
+
+        Args:
+            mu_data (str): MU data in string format.
+
+        Returns:
+            A tuble containing a header and payload for the MQTT message.
+        """
         # Split the string at whitespace
         split_data = mu_data.split(" ")
 
@@ -74,7 +117,13 @@ class Sensor_Node():
 
 
     def stop(self):
+        """
+        Stop the measurement and clean up.
+        """
         self.mu.stop_measurement()
+        if self.csv_object is not None:
+            self.csv_object.close_file()
+
         self.mu.restart()
 
 
