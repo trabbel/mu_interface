@@ -5,8 +5,8 @@ import numpy as np
 class ZMQ_Subscriber():
 
     def __init__(self):
-        context = zmq.Context()
-        self.socket = context.socket(zmq.SUB)
+        self.context = zmq.Context()
+        self.socket = self.context.socket(zmq.SUB)
         self.socket.bind("tcp://*:5556")
         self.socket.subscribe("")
 

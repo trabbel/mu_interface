@@ -90,7 +90,7 @@ class Sensor_Node():
         # Split the string at whitespace
         split_data = mu_data.split(" ")
 
-        # MU sends every 100 measurements id and measurement mode
+        # MU sends every 100 measurements id and measurement mode --> THIS PART BREAKS WHEN RESTARTING MEASUREMENTS, BUT THE PLAN IS TO REMOVE IT ANYWAY
         if split_data[0] == '#id':
             sanitized = [int(split_data[1])]
             # message is device ID
@@ -120,11 +120,18 @@ class Sensor_Node():
         """
         Stop the measurement and clean up.
         """
+        logging.info("Measurement stopped at %s.", datetime.datetime.now().strftime("%d.%m.%Y. %H:%M:%S"))
+        _ = self.mu.return_serial()
         self.mu.stop_measurement()
         if self.csv_object is not None:
             self.csv_object.close_file()
 
-        self.mu.restart()
+    def shutdown(self):
+        """
+        Perform final clean up on shutdown.
+        """
+        self.pub.socket.close()
+        self.pub.context.term()
 
 
     def restart(self):

@@ -5,8 +5,8 @@ import numpy as np
 class ZMQ_Publisher():
 
     def __init__(self):
-        context = zmq.Context()
-        self.socket = context.socket(zmq.PUB)
+        self.context = zmq.Context()
+        self.socket = self.context.socket(zmq.PUB)
         self.socket.connect("tcp://localhost:5556")
 
 

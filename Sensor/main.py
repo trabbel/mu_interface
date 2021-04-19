@@ -32,11 +32,20 @@ if __name__ == "__main__":
     # After this script gets terminated, the MU has to be 
     # manually restartet!
     ############################################################
-    try:
-        SN.start()
-    except KeyboardInterrupt:
-        SN.stop()
+    while True:
         try:
-            sys.exit(0)
-        except SystemExit:
-            os._exit(0)
+            SN.start()
+        except KeyboardInterrupt:
+            logging.info("Interrupted!")
+            SN.stop()
+
+            next_command = input('\nEnter a command:\n\tnew --> start new measurement\n\texit --> exit from the script\n> ')
+            if next_command != 'new':
+                if next_command != 'exit':
+                    print("Unknow command. Exiting.")
+                SN.shutdown()
+                try:
+                    sys.exit(0)
+                except SystemExit:
+                    os._exit(0)                    
+            

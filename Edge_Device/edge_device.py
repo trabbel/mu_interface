@@ -80,8 +80,17 @@ class Edge_Device():
         """
         Stop the subscriber and close all open csv files.
         """
+        logging.info("Stopped listening at %s.", datetime.datetime.now().strftime("%d.%m.%Y. %H:%M:%S"))
         for node in self.csv_objects:
             self.csv_objects[node].close_file()
+        self.csv_objects = {}
+
+    def shutdown(self):
+        """
+        Perform final clean up on shutdown.
+        """
+        self.sub.socket.close()
+        self.sub.context.term()
 
 
     def restart(self):

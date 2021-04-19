@@ -23,11 +23,18 @@ if __name__ == "__main__":
         csv_dir += '/'
 
     ED = Edge_Device(csv_dir)
-    try:
-        ED.start()
-    except KeyboardInterrupt:
-        ED.stop()
+    while True:
         try:
-            sys.exit(0)
-        except SystemExit:
-            os._exit(0)
+            ED.start()
+        except KeyboardInterrupt:
+            ED.stop()
+            
+            next_command = input('\nEnter a command:\n\tnew --> start new measurement\n\texit --> exit from the script\n> ')
+            if next_command != 'new':
+                if next_command != 'exit':
+                    print("Unknow command. Exiting.")
+                ED.shutdown()
+                try:
+                    sys.exit(0)
+                except SystemExit:
+                    os._exit(0)    
