@@ -7,21 +7,24 @@ import time, re
 
 class Sensor_Node():
 
-    def __init__(self, sensor_number, port, baudrate, meas_interval):
+    def __init__(self, hostname, port, baudrate, meas_interval):
 
         self.mu = Cybres_MU(port, baudrate)
         self.pub = ZMQ_Publisher()
-        self.number = sensor_number # This is the sensor number/hostname
+        self.hostname = hostname
         self.measurment_interval = meas_interval
 
     def start(self):
         self.mu.start_measurement()
         time.sleep(0.2)
-        logging.info("Sending.")
+
+        # Record the starting time and notify the user.
+        start_time = datetime.datetime.now()
+        logging.info("Measurement started at %s.", start_time.strftime("%d.%m.%Y. %H:%M:%S"))
 
         # Send the MU header:
         header = "".join(self.mu.return_serial() for _ in range(8))
-        self.pub.publish(np.array([self.number, 0]), header)
+        self.pub.publish((self.hostname, 0), header)
 
         time.sleep(1) # This is neccesarry, otherwise the next input is just 'Z'
 
@@ -29,9 +32,12 @@ class Sensor_Node():
         self.mu.set_measurement_interval(self.measurment_interval)
 
         while True:
+            # Get the current measurements.
             data = self.mu.return_serial()
+        
             stripped_data = re.sub("A|Z", "", data)
             if len(stripped_data) != 0:
+                # Send the sanitized data over the MQTT.
                 header, payload = self.sanitize_input(stripped_data)
                 self.pub.publish(header, payload)
 
@@ -61,7 +67,7 @@ class Sensor_Node():
             sanitized = timestamp + measurements
             # sanitized = measurements
         
-        header = np.array([self.number, messagetype])
+        header = (self.hostname, messagetype)
         payload = np.array(sanitized)
         # convert list in np array for serialization
         return header, payload

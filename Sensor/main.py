@@ -23,13 +23,9 @@ if __name__ == "__main__":
     setup_logger()
     logging.info('Starting sensor node.')
     
-    try:
-        device_id = int(re.findall("\d+$", socket.gethostname())[-1])
-    except IndexError:
-        logging.warning("Can't extract device ID from hostname %s! Device ID will be set to 0.", socket.gethostname())
-        device_id = 0
+    hostname = socket.gethostname()
 
-    SN = Sensor_Node(device_id, args.port, args.baud, args.int)
+    SN = Sensor_Node(hostname, args.port, args.baud, args.int)
     ############################################################
     # SN.mu.restart() TODO: restarting breaks the program, why?
     # After this script gets terminated, the MU has to be 

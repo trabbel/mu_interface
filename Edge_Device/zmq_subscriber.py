@@ -13,8 +13,10 @@ class ZMQ_Subscriber():
 
     # receive a custom multipart message
     def receive(self, flags=0, copy=True, track=False):
-        header = self.recv_array(flags=flags)
-        if header[1] == 0:
+        header = self.socket.recv_json(flags=flags)
+
+
+        if header['msg_type'] == 0:
             payload = self.socket.recv_string(flags=flags)
         else:
             payload = self.recv_array(flags=flags)

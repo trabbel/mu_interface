@@ -12,24 +12,24 @@ class Edge_Device():
         
         while True:
             header, payload = self.sub.receive()
-            logging.debug("Incoming data from node %d", header[0])
+            logging.debug("Incoming data from node %s", header['name'])
 
             # MU data header
-            if header[1] == 0:
+            if header['msg_type'] == 0:
                 payload = payload.split('\r\n')
                 logging.info("Measurement started at %s", payload[4].split()[1])
                 logging.info("Device ID: %s", payload[5].split()[1])
             # MU ID
-            elif header[1] == 1:
+            elif header['msg_type'] == 1:
                 logging.info("Device ID: %s", payload[0])
             # MU measurement mode
-            elif header[1] == 2:
+            elif header['msg_type'] == 2:
                 logging.info("Measurement mode: %s", payload[0])
             # MU data
-            elif header[1] == 3:
+            elif header['msg_type'] == 3:
                 print(payload)
             else:
-                logging.warning("Unknown message type: %d. Payload:\n%s", header[1], payload)
+                logging.warning("Unknown message type: %d. Payload:\n%s", header['msg_type'], payload)
 
 
     def stop(self):
