@@ -6,12 +6,12 @@ import time, re
 
 class Sensor_Node():
 
-    def __init__(self, sensor_number):
+    def __init__(self, sensor_number, port, baudrate, meas_interval):
 
-        # TODO: find port, maybe in main and give as parameter
-        self.mu = Cybres_MU('/dev/ttyACM0')
+        self.mu = Cybres_MU(port, baudrate)
         self.pub = ZMQ_Publisher()
         self.number = sensor_number # This is the sensor number/hostname
+        self.measurment_interval = meas_interval
 
 
     def start(self):
@@ -26,7 +26,7 @@ class Sensor_Node():
         time.sleep(1) # This is neccesarry, otherwise the next input is just 'Z'
 
         # measure every 10 seconds
-        self.mu.set_measurement_interval(10000)
+        self.mu.set_measurement_interval(self.measurment_interval)
 
         while True:
             data = self.mu.return_serial()

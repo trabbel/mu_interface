@@ -4,10 +4,10 @@ import serial
 
 class Cybres_MU:
 
-    def __init__(self, port_name):
+    def __init__(self, port_name, baudrate=460800):
         self.ser = serial.Serial(
             port=port_name,
-            baudrate=460800,
+            baudrate=baudrate,
             bytesize=serial.EIGHTBITS,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
