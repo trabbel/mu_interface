@@ -1,8 +1,17 @@
 #!/usr/bin/env python3
-from edge_device import Edge_Device
 import sys, os
+import logging
+from edge_device import Edge_Device
+
+sys.path.append("..") # Adds higher directory to python modules path.
+from Utilities.log_formatter import ColoredFormatter, setup_logger
+
 
 if __name__ == "__main__":
+    setup_logger()
+    logging.info("Starting edge node.")
+
+
     ED = Edge_Device()
     try:
         ED.start()

@@ -2,8 +2,13 @@
 import sys, os
 import re
 import socket
+import logging
 import argparse
 from sensor_node import Sensor_Node
+
+sys.path.append("..") # Adds higher directory to python modules path.
+from Utilities.log_formatter import ColoredFormatter, setup_logger
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Arguments for the sensor node.")
@@ -15,10 +20,13 @@ if __name__ == "__main__":
         help="Time interval between two measurements (in miliseconds).")
     args = parser.parse_args()
 
+    setup_logger()
+    logging.info('Starting sensor node.')
+    
     try:
         device_id = int(re.findall("\d+$", socket.gethostname())[-1])
     except IndexError:
-        print(f"[WARNING] Can't extract device ID from hostname {os.getenv('HOSTNAME', '0')}! Device ID will be set to 0.")
+        logging.warning("Can't extract device ID from hostname %s! Device ID will be set to 0.", socket.gethostname())
         device_id = 0
 
     SN = Sensor_Node(device_id, args.port, args.baud, args.int)

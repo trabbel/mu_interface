@@ -2,6 +2,7 @@
 from cybres_mu import Cybres_MU
 from zmq_publisher import ZMQ_Publisher
 import numpy as np
+import logging
 import time, re
 
 class Sensor_Node():
@@ -13,11 +14,10 @@ class Sensor_Node():
         self.number = sensor_number # This is the sensor number/hostname
         self.measurment_interval = meas_interval
 
-
     def start(self):
         self.mu.start_measurement()
         time.sleep(0.2)
-        print("sending")
+        logging.info("Sending.")
 
         # Send the MU header:
         header = "".join(self.mu.return_serial() for _ in range(8))
@@ -25,7 +25,7 @@ class Sensor_Node():
 
         time.sleep(1) # This is neccesarry, otherwise the next input is just 'Z'
 
-        # measure every 10 seconds
+        # Measure at set interval.
         self.mu.set_measurement_interval(self.measurment_interval)
 
         while True:
