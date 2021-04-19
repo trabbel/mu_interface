@@ -47,19 +47,17 @@ class Sensor_Node():
         # Create the file for storing measurement data.
         file_name = f"{self.hostname}_{start_time.strftime('%d_%m_%Y-%H_%M_%S')}.csv"
         self.csv_object = data2csv(self.file_path, file_name)
-        saved = True
+        last_time = start_time
 
         while True:
             # Create a new csv file after the specified interval.
             current_time = datetime.datetime.now()
-            if current_time.second == 0 and not saved:
+            if current_time.hour in {0, 6, 12, 18} and current_time.hour != last_time.hour:
                 logging.info("Creating a new csv file.")
                 self.csv_object.close_file()
                 file_name = f"{self.hostname}_{current_time.strftime('%d_%m_%Y-%H_%M_%S')}.csv"
                 self.csv_object = data2csv(self.file_path, file_name)
-                saved = True
-            elif current_time.second != 0:
-                saved = False
+                last_time = current_time
 
             # Get the current measurements.
             data = self.mu.return_serial()

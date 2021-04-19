@@ -22,6 +22,7 @@ class Edge_Device():
         """
         logging.info("Started listening at %s.", datetime.datetime.now().strftime("%d.%m.%Y. %H:%M:%S"))
         logging.info("Saving data to: %s", self.file_path)
+        last_time = datetime.datetime.now()
         
         while True:
             header, payload = self.sub.receive()
@@ -65,15 +66,13 @@ class Edge_Device():
 
             # Create new csv files at midnight.
             current_time = datetime.datetime.now()
-            if current_time.second == 0 and not saved:
+            if current_time.hour in {0, 6, 12, 18} and current_time.hour != last_time.hour:
                 logging.info("Creating new csv files.")
                 for node in self.csv_objects:
                     self.csv_objects[node].close_file()
                     file_name = f"{node}_{current_time.strftime('%d_%m_%Y-%H_%M_%S')}.csv"
                     self.csv_objects[node] = data2csv(self.file_path  + node + '/', file_name)
-                saved = True
-            elif current_time.second != 0:
-                saved = False
+                last_time = current_time
 
 
     def stop(self):
