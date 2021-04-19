@@ -102,8 +102,8 @@ class Sensor_Node():
         else:
             # message is data
             messagetype = 3
-            # timestamp is in format 'YY.MM.DD.HH.mm.ss', gets transformated in array
-            timestamp = [int(elem) for elem in split_data[0].split(":")]
+            # There is probably a better way to transform the timestamp.
+            timestamp = [int(x) for x in (datetime.datetime.now().strftime('%y:%m:%d:%H:%M:%S').split(':'))]
 
             # measurement data starts after timestamp
             measurements = [int(elem) for elem in split_data[1:]]
