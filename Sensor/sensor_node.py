@@ -36,7 +36,7 @@ class Sensor_Node():
         logging.info("Saving data to: %s", self.file_path)
 
         # Send the MU header:
-        header = "".join(self.mu.return_serial() for _ in range(8))
+        header = "".join(self.mu.return_serial() for _ in range(9))
         self.pub.publish((self.hostname, 0), header)
 
         time.sleep(1) # This is neccesarry, otherwise the next input is just 'Z'
@@ -105,8 +105,8 @@ class Sensor_Node():
 
             # measurement data starts after timestamp
             measurements = [int(elem) for elem in split_data[1:]]
-            sanitized = timestamp + measurements
-            # sanitized = measurements
+            # sanitized = timestamp + measurements
+            sanitized = [0] + measurements
         
         header = (self.hostname, messagetype)
         payload = np.array(sanitized)
@@ -121,6 +121,7 @@ class Sensor_Node():
         logging.info("Measurement stopped at %s.", datetime.datetime.now().strftime("%d.%m.%Y. %H:%M:%S"))
         _ = self.mu.return_serial()
         self.mu.stop_measurement()
+        a = "" + self.mu.return_serial()
         if self.csv_object is not None:
             self.csv_object.close_file()
 
