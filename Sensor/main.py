@@ -33,11 +33,6 @@ if __name__ == "__main__":
         csv_dir += '/'
 
     SN = Sensor_Node(hostname, args.port, args.baud, args.int, args.addr, csv_dir)
-    ############################################################
-    # SN.mu.restart() TODO: restarting breaks the program, why?
-    # After this script gets terminated, the MU has to be 
-    # manually restartet!
-    ############################################################
     while True:
         try:
             SN.start()

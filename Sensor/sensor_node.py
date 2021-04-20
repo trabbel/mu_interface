@@ -62,6 +62,7 @@ class Sensor_Node():
             # Get the current measurements.
             data = self.mu.return_serial()
         
+            # delete "Z" and "A" from data strings
             stripped_data = re.sub("A|Z", "", data)
             if len(stripped_data) != 0:
                 # Send the sanitized data over the MQTT.
@@ -121,7 +122,6 @@ class Sensor_Node():
         logging.info("Measurement stopped at %s.", datetime.datetime.now().strftime("%d.%m.%Y. %H:%M:%S"))
         _ = self.mu.return_serial()
         self.mu.stop_measurement()
-        a = "" + self.mu.return_serial()
         if self.csv_object is not None:
             self.csv_object.close_file()
 

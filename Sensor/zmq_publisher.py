@@ -11,6 +11,7 @@ class ZMQ_Publisher():
 
 
     # function for sending a custom multipart message
+    # refer to readme for more information
     def publish(self, header, payload, flags=0):
         header_dict = dict(name=header[0], msg_type=header[1])
         self.socket.send_json(header_dict, flags|zmq.SNDMORE)
