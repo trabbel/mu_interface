@@ -29,21 +29,12 @@ class Sensor_Node():
 
         # Measure at set interval.
         self.mu.set_measurement_interval(self.measurment_interval)
-        time.sleep(0.5)
-
         self.mu.start_measurement()
-        time.sleep(0.2)
 
         # Record the starting time and notify the user.
         start_time = datetime.datetime.now()
         logging.info("Measurement started at %s.", start_time.strftime("%d.%m.%Y. %H:%M:%S"))
         logging.info("Saving data to: %s", self.file_path)
-
-        # Send the MU header:
-        header = "".join(self.mu.return_serial() for _ in range(9))
-        self.pub.publish((self.hostname, 0), header)
-
-        time.sleep(1) # This is neccesarry, otherwise the next input is just 'Z'
 
         # Create the file for storing measurement data.
         file_name = f"{self.hostname}_{start_time.strftime('%d_%m_%Y-%H_%M_%S')}.csv"
@@ -60,59 +51,75 @@ class Sensor_Node():
                 self.csv_object = data2csv(self.file_path, file_name)
                 last_time = current_time
 
-            # Get the current measurements.
-            data = self.mu.return_serial()
-        
-            # delete "Z" and "A" from data strings
-            stripped_data = re.sub("A|Z", "", data)
-            if len(stripped_data) != 0:
-                # Send the sanitized data over the MQTT.
-                header, payload = self.sanitize_input(stripped_data)
+            # Get the next data set
+            next_line = self.mu.get_next()
+            header, payload = self.classify_message(next_line)
+
+            # Check for invalid data
+            if header != None:
                 self.pub.publish(header, payload)
 
-                # Store the data to the csv file.
+            # Store the data to the csv file.
+            if header[1] == 1:
                 e = self.csv_object.write2csv(payload.tolist())
                 if e is not None:
                     logging.error("Writing to csv file failed with error:\n%s\n\n\
                         Continuing because this is not a fatal error.", e)
-    
-    # MU data is in String format and will be transformed in an np array
-    def sanitize_input(self, mu_data):
+
+
+    def classify_message(self, mu_line):
+        """
+        Determines the message type.
+
+        Args:
+            mu_line (str): Complete MU data line
+
+        Returns:
+            A tuple containing a header and payload for the MQTT message.
+        """
+        counter = mu_line.count('#')
+        if counter == 0:
+            # Line is pure data message
+            messagetype = 1
+            payload = self.transform_data(mu_line)
+
+        elif counter == 2:
+            # Line is data message/id/measurement mode
+            # Every 100 measurements the MU sends also its own
+            # ID and measurement mode
+            messagetype = 2
+            messages = mu_line.split('#')
+            mu_id = int(messages[1].split(' ')[1])
+            mu_mm = int(messages[2].split(' ')[1])
+            # ID and mm get attached at the back of the data array
+            payload = np.append(self.transform_data(messages[0]), [mu_id, mu_mm] )
+
+        elif counter == 4:
+            # Line is header
+            messagetype = 0
+            payload = mu_line
+        else:
+            logging.warning("Unknown data type: \n%s", mu_line)
+            return None, None
+
+        header = (self.hostname, messagetype)
+        return header, payload
+
+
+    def transform_data(self, string_data):
         """
         Transform MU data from string to numpy array.
 
         Args:
-            mu_data (str): MU data in string format.
+            string_data (str): MU data in string format.
 
         Returns:
-            A tuble containing a header and payload for the MQTT message.
+            A numpy array containing the MU data
         """
-        # Split the string at whitespace
-        split_data = mu_data.split(" ")
-
-        # MU sends every 100 measurements id and measurement mode --> THIS PART BREAKS WHEN RESTARTING MEASUREMENTS, BUT THE PLAN IS TO REMOVE IT ANYWAY
-        if split_data[0] == '#id':
-            sanitized = [int(split_data[1])]
-            # message is device ID
-            messagetype = 1
-        elif split_data[0] == '#ta':
-            # message is measurement mode
-            messagetype = 2
-            sanitized = [int(split_data[1])]
-        else:
-            # message is data
-            messagetype = 3
-            # There is probably a better way to transform the timestamp.
-            timestamp = [int(time.mktime(datetime.datetime.now().timetuple()))]
-
-            # measurement data starts after timestamp
-            measurements = [int(elem) for elem in split_data[1:]]
-            sanitized = timestamp + measurements
-        
-        header = (self.hostname, messagetype)
-        payload = np.array(sanitized)
-        # convert list in np array for serialization
-        return header, payload
+        split_data = string_data.split(' ')
+        timestamp = [int(time.mktime(datetime.datetime.now().timetuple()))]
+        measurements = [int(elem) for elem in split_data[1:]]
+        return np.array(timestamp + measurements)
 
 
     def stop(self):
@@ -125,6 +132,7 @@ class Sensor_Node():
         if self.csv_object is not None:
             self.csv_object.close_file()
 
+
     def shutdown(self):
         """
         Perform final clean up on shutdown.
@@ -133,8 +141,3 @@ class Sensor_Node():
         self.mu.ser.close()
         self.pub.socket.close()
         self.pub.context.term()
-
-
-    def restart(self):
-        # TODO: Decide on restart routine: Only stop/start or new mu and pub? 
-        pass

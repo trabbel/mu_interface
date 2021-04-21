@@ -22,10 +22,35 @@ class Cybres_MU:
         self.ser.close()
         self.ser.open()
 
+        self.start_char = "Z"
+        
 
     def return_serial(self):
-        return self.ser.readline().decode('ascii')
+        return self.ser.read(1).decode('ascii')
 
+    # Finds the start of the next data set
+    def find_start(self):
+        start_found = False
+        while not start_found:
+            char = self.return_serial()
+            if char == 'A':
+                start_found = True
+        self.start_char = char
+    
+    # Returns the next complete data set
+    def get_next(self):
+        line = ""
+        end_found = False
+        if self.start_char != 'A':
+            self.find_start()
+        while not end_found:
+            next_char = self.return_serial()
+            if (next_char == 'Z'):
+                end_found = True
+            else:
+                line += next_char
+            self.start_char = next_char
+        return line[:-1]
 
     def restart(self):
         # restart MU
