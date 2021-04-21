@@ -14,8 +14,7 @@ class data2csv:
         self.csvfile = open(file_path + file_name, 'w')
         self.csvwriter = csv.writer(self.csvfile)
 
-        fields = ['date',
-                   'time',
+        fields = ['timestamp',
                    'sweep_freq',
                    # channel 1
                    'VImax_CH1',
@@ -69,12 +68,8 @@ class data2csv:
 
     def write2csv(self, data):
         try:
-            d = data.split()
-            d_data = list(map(int, d[1:]))
-            # MU has different timezone
-            time = datetime.now().strftime('%H:%M:%S')
-            date = datetime.now().strftime('%d/%m/%Y')
-            data4csv = [date, time] + d_data
+            timestamp = datetime.fromtimestamp(data[0]).strftime("%Y-%m-%d %H:%M:%S")
+            data4csv = [timestamp] + data[1:]
 
             self.csvwriter.writerow(data4csv)
 

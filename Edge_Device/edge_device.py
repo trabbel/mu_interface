@@ -44,7 +44,6 @@ class Edge_Device():
                 logging.info("Measurement mode: %s", payload[0])
             # MU data
             elif msg_type == 3:
-                logging.debug(" \n%s", payload)
 
                 # Create a new csv file if it doesn't exist for this sender.
                 if sender not in self.csv_objects:
@@ -53,7 +52,9 @@ class Edge_Device():
                     logging.info("Created file: %s", file_name)
 
                 # Read and format the data.
-                data = np.array2string(payload, suppress_small=True).strip('[]')
+                data = payload.tolist()
+                logging.debug(" \n%s", data)
+
 
                 # Store the data to the csv file.
                 e = self.csv_objects[sender].write2csv(data)

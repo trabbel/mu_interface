@@ -71,7 +71,7 @@ class Sensor_Node():
                 self.pub.publish(header, payload)
 
                 # Store the data to the csv file.
-                e = self.csv_object.write2csv(stripped_data)
+                e = self.csv_object.write2csv(payload.tolist())
                 if e is not None:
                     logging.error("Writing to csv file failed with error:\n%s\n\n\
                         Continuing because this is not a fatal error.", e)
@@ -103,12 +103,11 @@ class Sensor_Node():
             # message is data
             messagetype = 3
             # There is probably a better way to transform the timestamp.
-            timestamp = [int(x) for x in (datetime.datetime.now().strftime('%y:%m:%d:%H:%M:%S').split(':'))]
+            timestamp = [int(time.mktime(datetime.datetime.now().timetuple()))]
 
             # measurement data starts after timestamp
             measurements = [int(elem) for elem in split_data[1:]]
             sanitized = timestamp + measurements
-            # sanitized = [0] + measurements
         
         header = (self.hostname, messagetype)
         payload = np.array(sanitized)
