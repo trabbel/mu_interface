@@ -74,8 +74,7 @@ class data2csv:
             # MU has different timezone
             time = datetime.now().strftime('%H:%M:%S')
             date = datetime.now().strftime('%d/%m/%Y')
-            data4csv = [date, time]
-            data4csv += d_data
+            data4csv = [date, time] + d_data
 
             self.csvwriter.writerow(data4csv)
 

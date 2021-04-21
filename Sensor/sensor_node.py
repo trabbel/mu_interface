@@ -15,7 +15,6 @@ from Utilities.data2csv import data2csv
 class Sensor_Node():
 
     def __init__(self, hostname, port, baudrate, meas_interval, address, file_path):
-
         self.mu = Cybres_MU(port, baudrate)
         self.pub = ZMQ_Publisher(address)
         self.hostname = hostname
@@ -27,6 +26,11 @@ class Sensor_Node():
         """
         Start the measurements. Continue to publish over MQTT and store to csv.
         """
+
+        # Measure at set interval.
+        self.mu.set_measurement_interval(self.measurment_interval)
+        time.sleep(0.5)
+
         self.mu.start_measurement()
         time.sleep(0.2)
 
@@ -40,9 +44,6 @@ class Sensor_Node():
         self.pub.publish((self.hostname, 0), header)
 
         time.sleep(1) # This is neccesarry, otherwise the next input is just 'Z'
-
-        # Measure at set interval.
-        self.mu.set_measurement_interval(self.measurment_interval)
 
         # Create the file for storing measurement data.
         file_name = f"{self.hostname}_{start_time.strftime('%d_%m_%Y-%H_%M_%S')}.csv"
@@ -106,8 +107,8 @@ class Sensor_Node():
 
             # measurement data starts after timestamp
             measurements = [int(elem) for elem in split_data[1:]]
-            # sanitized = timestamp + measurements
-            sanitized = [0] + measurements
+            sanitized = timestamp + measurements
+            # sanitized = [0] + measurements
         
         header = (self.hostname, messagetype)
         payload = np.array(sanitized)
@@ -129,6 +130,8 @@ class Sensor_Node():
         """
         Perform final clean up on shutdown.
         """
+        self.mu.restart()
+        self.mu.ser.close()
         self.pub.socket.close()
         self.pub.context.term()
 

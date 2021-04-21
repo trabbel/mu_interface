@@ -18,6 +18,7 @@ class Cybres_MU:
         )
         
         self.ser.flushInput()
+        self.ser.flushOutput() # Just in case...
         self.ser.close()
         self.ser.open()
 
