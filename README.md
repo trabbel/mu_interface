@@ -1,52 +1,26 @@
-# Linux
-## For setting up the sensor 
-1. Turn on the sensor (wait till it beeps).
-2. Type (in order to get rit of the error access denied): 
-    ```sh
-    sudo chmod 666 /dev/ttyACM0
-    ```
-3. Run the scripts with 
-   ```bash
-   python3 <scriptName>.py
-   ```
-   
-# Windows 
-1. Turn on sensor (wait till it beeps).
-2. Go to directory where your code is 
-3. run script
-    ```cmd
-   py <scriptname>.py
-   ```
-   For running the command line tool: 
-   ```cmd
-   py clt.py
-   ```
-# Sensor information (MU3)
-Baud: 460800 <br>
-Parity: None <br>
-Data Bits: 8 <br>
-Stop Bits: 1 <br>
-Flow Control: None <br>
-<br>
-It seems that the sensor has to be restarted everytime you want to start a new connection. 
+# WatchPlant data collection setup
 
-## For linux
-Port: /dev/ttyACM0 (findet man mit tree /dev) <br>
-<br>
-get output from sensor in cutecom :
-1. turn on sensor 
-2. start measuring 
-3. connect in cutecom
+This is the planned structure for the WatchPlant data collection setup. The scripts in the folder Edge_Device will run on one RPi to collect data, the scripts in the folder Sensor will run on RPis connected to a Cybres MU. *Utilities* are required by all RPis. On both the Edge Device and Sensor is one *main.py* file. They are the starting point and the only files that must be executed.
 
-if it does not work just try to connect/disconnect a few times sometimes it works?
+## Needed software
+To run the scripts, a python 3 installation is needed. Also pip install the following packages: 
+```bash
+pip3 install pyserial numpy zmq
+```
+Note: Both the packages *zmq* and *pyzmq* work.
+## File saving
+The measured data gets saved as .csv file both on the Sensor Node and the Edge Device. Default location for the Sensor Node resp. Edge Device are ``/home/$USER/measurements`` resp. ``/home/$USER/measurements/hostname``, where ``hostname`` is the hostname of the Sensor Node which sent the data.
+## Sending data
+Edge Device and Sensor Nodes communicate wirelessly using [ZeroMQ](https://zeromq.org/). Depending on the local network setup, the addresses in the classes *ZMQ_Publisher* and *ZMQ_Subscriber* must be changed. Refer to [the ZMQ documentation](http://api.zeromq.org/3-2:zmq-tcp) for more information.
 
-## For windows
-Port: COM5 (findet man mit device manager) 
+## Message format
+ZMQ allows to send custom message formats using [multipart messages](http://api.zeromq.org/3-2:zmq-send). Every message send to the edge device consists of two parts: The header and the payload. The header is a python dictionary with two entries, the first is the Sensor Node's hostname. The second is an integer between 0 and 2 and specifies the type of payload (the MU can send three different message types):
+|Number|Message Type|Payload|
+|---|---|---|  
+| 0 | MU data header | String|
+| 1 | Measurement Data | numpy array with 45 fields|
+| 2 | Measurement Data/ID/Mode | numpy array with 47 field|
 
-# clt.py
-This is a command line tool, where you can send a comment (see user manual) and receive the corresponding response. 
+The measurement data array consists of a timestamp generated on the Sensor Node RPi and the split data string from the MU. Every 100 measurements the MU also sends its ID and measurement mode, these values are in the 46. and 47. array fields.
 
-# TODO List
-For some reason the connection with linux is a hack around :D. Maybe we can ask at the work shop for more details or how
-to interact with the MU... there is a script (ctl_for_linux) which works sometimes. Description on how it works you find
-in the source code. 
+The hostnames should be named as ``rpi[index]``, e.g.: ``rpi0``, ``rpi1``, ...
