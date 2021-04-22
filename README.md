@@ -14,7 +14,7 @@ The measured data gets saved as .csv file both on the Sensor Node and the Edge D
 Edge Device and Sensor Nodes communicate wirelessly using [ZeroMQ](https://zeromq.org/). Depending on the local network setup, the addresses in the classes *ZMQ_Publisher* and *ZMQ_Subscriber* must be changed. Refer to [the ZMQ documentation](http://api.zeromq.org/3-2:zmq-tcp) for more information.
 
 ## Message format
-ZMQ allows to send custom message formats using [multipart messages](http://api.zeromq.org/3-2:zmq-send). Every message send to the edge device consists of two parts: The header and the payload. The header is a python dictionary with two entries, the first is the Sensor Node's hostname. The second is an integer between 0 and 2 and specifies the type of payload (the MU can send four different message types):
+ZMQ allows to send custom message formats using [multipart messages](http://api.zeromq.org/3-2:zmq-send). Every message send to the edge device consists of two parts: The header and the payload. The header is a python dictionary with two entries, the first is the Sensor Node's hostname. The second is an integer between 0 and 2 and specifies the type of payload (the MU can send three different message types):
 |Number|Message Type|Payload|
 |---|---|---|  
 | 0 | MU data header | String|
