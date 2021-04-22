@@ -176,3 +176,4 @@ Thumbs.db
 # End of https://www.toptal.com/developers/gitignore/api/linux,python,vscode
 
 # some more ignores from till sry
+.idea/
