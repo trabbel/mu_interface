@@ -23,6 +23,8 @@ class Sensor_Node():
         self.csv_object = None
         self.msg_count = 0
         self.start_time = None
+        self.mu_id = 0
+        self.mu_mm = 0
 
     def start(self):
         """
@@ -64,7 +66,7 @@ class Sensor_Node():
             # Store the data to the csv file.
             if header[1] == 1:
                 self.msg_count += 1
-                e = self.csv_object.write2csv(payload.tolist())
+                e = self.csv_object.write2csv(payload.tolist()+[self.hostname])
                 if e is not None:
                     logging.error("Writing to csv file failed with error:\n%s\n\n\
                         Continuing because this is not a fatal error.", e)
@@ -90,7 +92,9 @@ class Sensor_Node():
         if counter == 0:
             # Line is pure data message
             messagetype = 1
-            payload = self.transform_data(mu_line)
+            transfromed_data = self.transform_data(mu_line)
+            # ID and MM are manually added
+            payload = np.append(transfromed_data, [self.mu_mm, self.mu_id])
 
         elif counter == 2:
             # Line is data message/id/measurement mode
@@ -101,12 +105,16 @@ class Sensor_Node():
             mu_id = int(messages[1].split(' ')[1])
             mu_mm = int(messages[2].split(' ')[1])
             # ID and mm get attached at the back of the data array
-            payload = np.append(self.transform_data(messages[0]), [mu_id, mu_mm] )
+            payload = np.append(self.transform_data(messages[0]), [mu_mm, mu_id] )
 
         elif counter == 4:
             # Line is header
             messagetype = 0
             payload = mu_line
+            # ID and MM are saved from the header
+            lines = mu_line.split('\r\n')
+            self.mu_id = int(lines[3].split()[1])
+            self.mu_mm = int(lines[4].split()[1])
         else:
             logging.warning("Unknown data type: \n%s", mu_line)
             return None, None

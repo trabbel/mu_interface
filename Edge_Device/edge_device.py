@@ -47,9 +47,9 @@ class Edge_Device():
                 self.msg_counter[sender] += 1
             # MU data/ID/measurement mode
             elif msg_type == 2:
-                self.save_data(sender, payload[:-2])
+                self.save_data(sender, payload)
                 logging.info("Node %s reporting: MU ID is %s, current measurement mode is: %s",
-                             sender, payload[-2], payload[-1])
+                             sender, payload[-1], payload[-2])
             # Unknown
             else:
                 logging.warning("Unknown message type: %d. Payload:\n%s", msg_type, payload)
@@ -84,7 +84,7 @@ class Edge_Device():
             logging.info("Created file: %s", file_name)
 
         # Read and format the data.
-        data = payload.tolist()
+        data = payload.tolist() + [sender]
         logging.debug(" \n%s", data)
 
 

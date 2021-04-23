@@ -59,7 +59,10 @@ class data2csv:
                    'empty6',
                    'empty7',
                    'reserved1',
-                   'reserved2']
+                   'reserved2',
+                   'MU_MM',
+                   'MU_ID',
+                   'sender_hostname']
 
         self.csvwriter.writerow(fields)
 
