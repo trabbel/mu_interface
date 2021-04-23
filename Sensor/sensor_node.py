@@ -21,6 +21,10 @@ class Sensor_Node():
         self.measurment_interval = meas_interval
         self.file_path = file_path
         self.csv_object = None
+        self.msg_count = 0
+        self.start_time = None
+        self.mu_id = 0
+        self.mu_mm = 0
 
     def start(self):
         """
@@ -32,14 +36,14 @@ class Sensor_Node():
         self.mu.start_measurement()
 
         # Record the starting time and notify the user.
-        start_time = datetime.datetime.now()
-        logging.info("Measurement started at %s.", start_time.strftime("%d.%m.%Y. %H:%M:%S"))
+        self.start_time = datetime.datetime.now()
+        logging.info("Measurement started at %s.", self.start_time.strftime("%d.%m.%Y. %H:%M:%S"))
         logging.info("Saving data to: %s", self.file_path)
 
         # Create the file for storing measurement data.
-        file_name = f"{self.hostname}_{start_time.strftime('%d_%m_%Y-%H_%M_%S')}.csv"
+        file_name = f"{self.hostname}_{self.start_time.strftime('%d_%m_%Y-%H_%M_%S')}.csv"
         self.csv_object = data2csv(self.file_path, file_name)
-        last_time = start_time
+        last_time = datetime.datetime.now()
 
         while True:
             # Create a new csv file after the specified interval.
@@ -61,10 +65,17 @@ class Sensor_Node():
 
             # Store the data to the csv file.
             if header[1] == 1:
-                e = self.csv_object.write2csv(payload.tolist())
+                self.msg_count += 1
+                e = self.csv_object.write2csv(payload.tolist()+[self.hostname])
                 if e is not None:
                     logging.error("Writing to csv file failed with error:\n%s\n\n\
                         Continuing because this is not a fatal error.", e)
+
+            # Print out a status message roughly every 30 mins
+            if self.msg_count % 180 == 0 and self.msg_count > 0:
+                td = datetime.datetime.now() - self.start_time
+                duration = f"{td.seconds // 3600 :02}:{td.seconds // 60 % 60 :02}:{td.seconds % 60 :02} [HH:MM:SS]"
+                logging.info("I am measuring for %s and I collected %d datapoints.", duration, self.msg_count)
 
 
     def classify_message(self, mu_line):
@@ -81,7 +92,9 @@ class Sensor_Node():
         if counter == 0:
             # Line is pure data message
             messagetype = 1
-            payload = self.transform_data(mu_line)
+            transfromed_data = self.transform_data(mu_line)
+            # ID and MM are manually added
+            payload = np.append(transfromed_data, [self.mu_mm, self.mu_id])
 
         elif counter == 2:
             # Line is data message/id/measurement mode
@@ -92,12 +105,16 @@ class Sensor_Node():
             mu_id = int(messages[1].split(' ')[1])
             mu_mm = int(messages[2].split(' ')[1])
             # ID and mm get attached at the back of the data array
-            payload = np.append(self.transform_data(messages[0]), [mu_id, mu_mm] )
+            payload = np.append(self.transform_data(messages[0]), [mu_mm, mu_id] )
 
         elif counter == 4:
             # Line is header
             messagetype = 0
             payload = mu_line
+            # ID and MM are saved from the header
+            lines = mu_line.split('\r\n')
+            self.mu_id = int(lines[3].split()[1])
+            self.mu_mm = int(lines[4].split()[1])
         else:
             logging.warning("Unknown data type: \n%s", mu_line)
             return None, None

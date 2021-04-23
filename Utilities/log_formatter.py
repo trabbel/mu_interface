@@ -43,4 +43,4 @@ def setup_logger():
     consoleHandler.setFormatter(colorFormatter)
     rootLogger.addHandler(consoleHandler)
 
-    rootLogger.setLevel(logging.DEBUG)
+    rootLogger.setLevel(logging.INFO)
