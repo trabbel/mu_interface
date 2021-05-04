@@ -71,7 +71,7 @@ class Edge_Device():
                 logging.info("Creating new csv files.")
                 for node in self.csv_objects:
                     self.csv_objects[node].close_file()
-                    file_name = f"{node}_{current_time.strftime('%d_%m_%Y-%H_%M_%S')}.csv"
+                    file_name = f"{node}_{current_time.strftime('%Y_%m_%d-%H_%M_%S')}.csv"
                     self.csv_objects[node] = data2csv(self.file_path  + node + '/', file_name)
                 last_csv_time = current_time
 
@@ -79,7 +79,7 @@ class Edge_Device():
     def save_data(self, sender, payload):
         # Create a new csv file if it doesn't exist for this sender.
         if sender not in self.csv_objects:
-            file_name = f"{sender}_{datetime.datetime.now().strftime('%d_%m_%Y-%H_%M_%S')}.csv"
+            file_name = f"{sender}_{datetime.datetime.now().strftime('%Y_%m_%d-%H_%M_%S')}.csv"
             self.csv_objects[sender] = data2csv(self.file_path + sender + '/', file_name)
             logging.info("Created file: %s", file_name)
 

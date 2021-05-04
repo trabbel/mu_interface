@@ -41,7 +41,7 @@ class Sensor_Node():
         logging.info("Saving data to: %s", self.file_path)
 
         # Create the file for storing measurement data.
-        file_name = f"{self.hostname}_{self.start_time.strftime('%d_%m_%Y-%H_%M_%S')}.csv"
+        file_name = f"{self.hostname}_{self.start_time.strftime('%Y_%m_%d-%H_%M_%S')}.csv"
         self.csv_object = data2csv(self.file_path, file_name)
         last_time = datetime.datetime.now()
 
@@ -51,7 +51,7 @@ class Sensor_Node():
             if current_time.hour in {0, 6, 12, 18} and current_time.hour != last_time.hour:
                 logging.info("Creating a new csv file.")
                 self.csv_object.close_file()
-                file_name = f"{self.hostname}_{current_time.strftime('%d_%m_%Y-%H_%M_%S')}.csv"
+                file_name = f"{self.hostname}_{current_time.strftime('%Y_%m_%d-%H_%M_%S')}.csv"
                 self.csv_object = data2csv(self.file_path, file_name)
                 last_time = current_time
 
