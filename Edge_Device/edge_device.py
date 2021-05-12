@@ -34,7 +34,7 @@ class Edge_Device():
             sender = header['name']
             msg_type = header['msg_type']
 
-            logging.debug("Incoming data from node %s", sender)
+            logging.debug("Incoming data from node %s:\n%s", sender, payload)
 
             # MU data header
             if msg_type == 0:
@@ -60,14 +60,15 @@ class Edge_Device():
             elapsed = current_time - last_info_time
             if elapsed.seconds > 1800:
                 td = current_time - self.start_time
-                duration = f"{td.seconds // 3600 :02}:{td.seconds // 60 % 60 :02}:{td.seconds % 60 :02} [HH:MM:SS]"
+                hms = (td.seconds // 3600, td.seconds // 60 % 60, td.seconds % 60)
+                duration = f"{td.days} days, {hms[0] :02}:{hms[1] :02}:{hms[2] :02} [HH:MM:SS]"
                 logging.info("I am measuring for %s and I collected the following number of datapoints:\n%s", 
                              duration, "\n".join([f"{key}: {val}" for key, val in self.msg_counter.items()]))
                 last_info_time = current_time
 
 
             # Create new csv files at midnight.
-            if current_time.hour in {0, 6, 12, 18} and current_time.hour != last_csv_time.hour:
+            if current_time.hour in {0, 12} and current_time.hour != last_csv_time.hour:
                 logging.info("Creating new csv files.")
                 for node in self.csv_objects:
                     self.csv_objects[node].close_file()

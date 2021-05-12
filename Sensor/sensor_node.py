@@ -48,7 +48,7 @@ class Sensor_Node():
         while True:
             # Create a new csv file after the specified interval.
             current_time = datetime.datetime.now()
-            if current_time.hour in {0, 6, 12, 18} and current_time.hour != last_time.hour:
+            if current_time.hour in {0, 12} and current_time.hour != last_time.hour:
                 logging.info("Creating a new csv file.")
                 self.csv_object.close_file()
                 file_name = f"{self.hostname}_{current_time.strftime('%Y_%m_%d-%H_%M_%S')}.csv"
@@ -74,7 +74,8 @@ class Sensor_Node():
             # Print out a status message roughly every 30 mins
             if self.msg_count % 180 == 0 and self.msg_count > 0:
                 td = datetime.datetime.now() - self.start_time
-                duration = f"{td.seconds // 3600 :02}:{td.seconds // 60 % 60 :02}:{td.seconds % 60 :02} [HH:MM:SS]"
+                hms = (td.seconds // 3600, td.seconds // 60 % 60, td.seconds % 60)
+                duration = f"{td.days} days, {hms[0] :02}:{hms[1] :02}:{hms[2] :02} [HH:MM:SS]"
                 logging.info("I am measuring for %s and I collected %d datapoints.", duration, self.msg_count)
 
 
