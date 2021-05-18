@@ -1,70 +1,31 @@
 #!/usr/bin/env python3
 import csv
+import yaml
 from datetime import datetime
 from pathlib import Path
-from operator import methodcaller
 
 
 class data2csv:
 
-    def __init__(self, file_path, file_name):
+    def __init__(self, file_path, file_name, config_file=None):
 
         Path(file_path).mkdir(parents=True, exist_ok=True) # make new directory
         
         self.csvfile = open(file_path + file_name, 'w')
         self.csvwriter = csv.writer(self.csvfile)
 
-        fields = ['timestamp',
-                   'sweep_freq',
-                   # channel 1
-                   'VImax_CH1',
-                   'VImin_CH1',
-                   'RMS_CH1',
-                   'Phas_CH1',
-                   'VVmax_CH1',
-                   'VVmin_CH1',
-                   'Corr_CH1',
-                   # channel 2
-                   'VImax_CHL2',
-                   'VImin_CH2',
-                   'RMS_CH2',
-                   'Phas_CH2',
-                   'VVmax_CH2',
-                   'VVmin_CH2',
-                   'Corr_CH2',
-                   # system data
-                   'temp-PCB',
-                   'temp-thermostat',
-                   # magnetometer and accelerometer data
-                   'mag_X', 'mag_Y', 'mag_Z',
-                   'acc_X', 'acc_Y', 'acc_Z',
-                   # external sensors
-                   'temp-external',
-                   'light-external',
-                   'humidity-external',
-                   'differential_potential_CH1',
-                   'differential_potential_CH2',
-                   'RF_power_emission',
-                   'transpiration',
-                   'sap_flow',
-                   'air_pressure',
-                   'soil_moisture',
-                   'soil_temperature',
-                   'ambient_light',
-                   'empty1',
-                   'empty2',
-                   'empty3',
-                   'empty4',
-                   'empty5',
-                   'empty6',
-                   'empty7',
-                   'reserved1',
-                   'reserved2',
-                   'MU_MM',
-                   'MU_ID',
-                   'sender_hostname']
+        if config_file is None:
+            config_file = Path(__file__).parent.absolute() / "data_fields.yaml"
 
-        self.csvwriter.writerow(fields)
+        with open(config_file) as stream:
+            config = yaml.safe_load(stream)
+
+        # Data fields are loaded in their original order by default
+        # and we always want to add our timestamp.
+        header = ['timestamp'] + [key for key in config if config[key] is True]
+        self.csvwriter.writerow(header)
+
+        self.filter = [i for i, x in enumerate(config.values()) if x]
 
     def close_file(self):
         self.csvfile.close()
@@ -72,7 +33,8 @@ class data2csv:
     def write2csv(self, data):
         try:
             timestamp = datetime.fromtimestamp(data[0]).strftime("%Y-%m-%d %H:%M:%S")
-            data4csv = [timestamp] + data[1:]
+            filtered_data = [data[i] for i in self.filter]
+            data4csv = [timestamp] + filtered_data
 
             self.csvwriter.writerow(data4csv)
 
