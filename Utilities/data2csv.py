@@ -7,7 +7,7 @@ from pathlib import Path
 
 class data2csv:
 
-    def __init__(self, file_path, file_name, config_file=None):
+    def __init__(self, file_path, file_name, additionalSensors, config_file=None):
 
         Path(file_path).mkdir(parents=True, exist_ok=True) # make new directory
         self.file_path = file_path
@@ -24,18 +24,18 @@ class data2csv:
 
         # Data fields are loaded in their original order by default
         # and we always want to add our timestamp.
-        header = ['timestamp'] + [key for key in config if config[key] is True]
+        header = ['timestamp'] + [key for key in config if config[key] is True] + (additionalSensors if additionalSensors != False else [])
         self.csvwriter.writerow(header)
         self.csvfile.close()
 
-        self.filter = [i for i, x in enumerate(config.values()) if x]
+        self.filter = [i for i, x in enumerate(config.values()) if x] + ([j + len(config) for j in range(len(additionalSensors))] if additionalSensors != False else [])
 
     def close_file(self):
         self.csvfile.close()
 
     def write2csv(self, data):
         try:
-            timestamp = datetime.fromtimestamp(data[0]).strftime("%Y-%m-%d %H:%M:%S")
+            timestamp = datetime.fromtimestamp(data[3]).strftime("%Y-%m-%d %H:%M:%S")
             filtered_data = [data[i] for i in self.filter]
             data4csv = [timestamp] + filtered_data
 

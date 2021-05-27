@@ -30,7 +30,7 @@ class Edge_Device():
         last_info_time = datetime.datetime.now()
         
         while True:
-            header, payload = self.sub.receive()
+            header, additionalSensors, payload = self.sub.receive()
             sender = header['name']
             msg_type = header['msg_type']
 
@@ -43,13 +43,13 @@ class Edge_Device():
                 logging.info("Measurement unit ID: %s", payload[3].split()[1])
             # MU data
             elif msg_type == 1:
-                self.save_data(sender, payload)
+                self.save_data(sender, additionalSensors, payload)
                 self.msg_counter[sender] += 1
             # MU data/ID/measurement mode
             elif msg_type == 2:
-                self.save_data(sender, payload)
+                self.save_data(sender, additionalSensors, payload)
                 logging.info("Node %s reporting: MU ID is %s, current measurement mode is: %s",
-                             sender, payload[-1], payload[-2])
+                             sender, payload[3], payload[2])
             # Unknown
             else:
                 logging.warning("Unknown message type: %d. Payload:\n%s", msg_type, payload)
@@ -77,15 +77,15 @@ class Edge_Device():
                 last_csv_time = current_time
 
 
-    def save_data(self, sender, payload):
+    def save_data(self, sender, additionalSensors, payload):
         # Create a new csv file if it doesn't exist for this sender.
         if sender not in self.csv_objects:
             file_name = f"{sender}_{datetime.datetime.now().strftime('%Y_%m_%d-%H_%M_%S')}.csv"
-            self.csv_objects[sender] = data2csv(self.file_path + sender + '/', file_name)
+            self.csv_objects[sender] = data2csv(self.file_path + sender + '/', file_name, additionalSensors)
             logging.info("Created file: %s", file_name)
 
         # Read and format the data.
-        data = payload.tolist() + [sender]
+        data = [sender] + payload.tolist()
         logging.debug(" \n%s", data)
 
 

@@ -15,11 +15,14 @@ class ZMQ_Subscriber():
     # refer to readme for more information
     def receive(self, flags=0, copy=True, track=False):
         header = self.socket.recv_json(flags=flags)
+        additionalSensors = False
         if header['msg_type'] == 0:
             payload = self.socket.recv_string(flags=flags)
         else:
+            if header['add_sensor']:
+                additionalSensors = self.socket.recv_json(flags=flags)
             payload = self.recv_array(flags=flags)
-        return header, payload
+        return header, additionalSensors, payload
 
 
     # function for receiving and deserializing np arrays
