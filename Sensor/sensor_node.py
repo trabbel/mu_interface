@@ -28,7 +28,7 @@ class Sensor_Node():
 
         # Add the names of the additional data columns to the list
         # e.g. ['ozon-conc', 'intensity-red', 'intensity-blue']
-        self.additionalSensors = ['derTest', 'anderes']
+        self.additionalSensors = []
 
     def start(self):
         """
@@ -130,7 +130,7 @@ class Sensor_Node():
             # additionalValues = [getOzonValues(), getRGBValues()]
             # Important: len(self.sensors) == len(additionalValues), otherwise
             # it won't work
-            additionalValues = [42, 5]
+            additionalValues = None
             payload = np.append(payload, additionalValues)
 
 
