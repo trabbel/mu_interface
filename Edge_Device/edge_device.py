@@ -39,6 +39,10 @@ class Edge_Device():
             # MU data header
             if msg_type == 0:
                 payload = payload.split('\r\n')
+
+                # Delete csv object if it exists for new sensor config
+                self.csv_objects.pop(sender, None)
+                
                 logging.info("Measurement started on node %s at %s", sender, payload[2].split()[1])
                 logging.info("Measurement unit ID: %s", payload[3].split()[1])
             # MU data
