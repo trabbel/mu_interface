@@ -56,7 +56,7 @@ class Sensor_Node():
                 logging.info("Creating a new csv file.")
                 self.csv_object.close_file()
                 file_name = f"{self.hostname}_{current_time.strftime('%Y_%m_%d-%H_%M_%S')}.csv"
-                self.csv_object = data2csv(self.file_path, file_name)
+                self.csv_object = data2csv(self.file_path, file_name, self.additionalSensors)
                 last_time = current_time
 
             # Get the next data set
@@ -130,7 +130,7 @@ class Sensor_Node():
             # additionalValues = [getOzonValues(), getRGBValues()]
             # Important: len(self.sensors) == len(additionalValues), otherwise
             # it won't work
-            additionalValues = None
+            additionalValues = []
             payload = np.append(payload, additionalValues)
 
 

@@ -77,7 +77,7 @@ class Edge_Device():
                 for node in self.csv_objects:
                     self.csv_objects[node].close_file()
                     file_name = f"{node}_{current_time.strftime('%Y_%m_%d-%H_%M_%S')}.csv"
-                    self.csv_objects[node] = data2csv(self.file_path  + node + '/', file_name)
+                    self.csv_objects[node] = data2csv(self.file_path  + node + '/', file_name, additionalSensors)
                 last_csv_time = current_time
 
 
