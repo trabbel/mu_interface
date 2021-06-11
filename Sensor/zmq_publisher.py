@@ -12,14 +12,15 @@ class ZMQ_Publisher():
 
     # function for sending a custom multipart message
     # refer to readme for more information
-    def publish(self, header, payload, flags=0):
-        header_dict = dict(name=header[0], msg_type=header[1])
+    def publish(self, header, additionalSensors, payload, flags=0):
+        header_dict = dict(name=header[0], msg_type=header[1], add_sensor=header[2])
         self.socket.send_json(header_dict, flags|zmq.SNDMORE)
 
         if header[1] == 0:
             return self.socket.send_string(payload, flags)
-        else:
-            return self.send_array(payload, flags)
+        if header[2]:
+            self.socket.send_json(additionalSensors, flags|zmq.SNDMORE)
+        return self.send_array(payload, flags)
 
 
     # function for serializing and sending np arrays

@@ -26,6 +26,10 @@ class Sensor_Node():
         self.mu_id = 0
         self.mu_mm = 0
 
+        # Add the names of the additional data columns to the list
+        # e.g. ['ozon-conc', 'intensity-red', 'intensity-blue']
+        self.additionalSensors = []
+
     def start(self):
         """
         Start the measurements. Continue to publish over MQTT and store to csv.
@@ -42,7 +46,7 @@ class Sensor_Node():
 
         # Create the file for storing measurement data.
         file_name = f"{self.hostname}_{self.start_time.strftime('%Y_%m_%d-%H_%M_%S')}.csv"
-        self.csv_object = data2csv(self.file_path, file_name)
+        self.csv_object = data2csv(self.file_path, file_name, self.additionalSensors)
         last_time = datetime.datetime.now()
 
         while True:
@@ -52,7 +56,7 @@ class Sensor_Node():
                 logging.info("Creating a new csv file.")
                 self.csv_object.close_file()
                 file_name = f"{self.hostname}_{current_time.strftime('%Y_%m_%d-%H_%M_%S')}.csv"
-                self.csv_object = data2csv(self.file_path, file_name)
+                self.csv_object = data2csv(self.file_path, file_name, self.additionalSensors)
                 last_time = current_time
 
             # Get the next data set
@@ -61,12 +65,12 @@ class Sensor_Node():
 
             # Check for invalid data
             if header != None:
-                self.pub.publish(header, payload)
+                self.pub.publish(header, self.additionalSensors, payload)
 
             # Store the data to the csv file.
             if header[1] == 1:
                 self.msg_count += 1
-                e = self.csv_object.write2csv(payload.tolist()+[self.hostname])
+                e = self.csv_object.write2csv([self.hostname] + payload.tolist())
                 if e is not None:
                     logging.error("Writing to csv file failed with error:\n%s\n\n\
                         Continuing because this is not a fatal error.", e)
@@ -95,7 +99,7 @@ class Sensor_Node():
             messagetype = 1
             transfromed_data = self.transform_data(mu_line)
             # ID and MM are manually added
-            payload = np.append(transfromed_data, [self.mu_mm, self.mu_id])
+            payload = np.append([self.mu_mm, self.mu_id], transfromed_data)
 
         elif counter == 2:
             # Line is data message/id/measurement mode
@@ -106,7 +110,7 @@ class Sensor_Node():
             mu_id = int(messages[1].split(' ')[1])
             mu_mm = int(messages[2].split(' ')[1])
             # ID and mm get attached at the back of the data array
-            payload = np.append(self.transform_data(messages[0]), [mu_mm, mu_id] )
+            payload = np.append([mu_mm, mu_id], self.transform_data(messages[0]))
 
         elif counter == 4:
             # Line is header
@@ -120,7 +124,17 @@ class Sensor_Node():
             logging.warning("Unknown data type: \n%s", mu_line)
             return None, None
 
-        header = (self.hostname, messagetype)
+        # Add data from additional external sensors
+        if self.additionalSensors and messagetype in {1, 2}:
+            # Call here a get_data() method, e.g.:
+            # additionalValues = [getOzonValues(), getRGBValues()]
+            # Important: len(self.sensors) == len(additionalValues), otherwise
+            # it won't work
+            additionalValues = []
+            payload = np.append(payload, additionalValues)
+
+
+        header = (self.hostname, messagetype, bool(self.additionalSensors))
         return header, payload
 
 

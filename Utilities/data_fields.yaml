@@ -1,3 +1,7 @@
+# metadata
+'sender_hostname': True
+'MU_MM'     : True
+'MU_ID'     : True
 'timestamp' : False
 'sweep_freq': False
 # channel 1
@@ -52,7 +56,3 @@
 # reserved
 'reserved1': False
 'reserved2': False
-# extra fields
-'MU_MM'          : True
-'MU_ID'          : True
-'sender_hostname': True
