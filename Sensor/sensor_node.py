@@ -7,6 +7,7 @@ import datetime
 import numpy as np
 
 from cybres_mu import Cybres_MU
+# from Additional_Sensors.rgbtcs34725 import RGB_TCS34725
 from zmq_publisher import ZMQ_Publisher
 
 sys.path.append("..") # Adds higher directory to python modules path.
@@ -28,7 +29,8 @@ class Sensor_Node():
 
         # Add the names of the additional data columns to the list
         # e.g. ['ozon-conc', 'intensity-red', 'intensity-blue']
-        self.additionalSensors = []
+        # self.rgb = RGB_TCS34725()
+        self.additionalSensors = []#['light-red', 'light-green', 'light-blue', 'color-temperature', 'light-intensity']
 
     def start(self):
         """
@@ -130,7 +132,7 @@ class Sensor_Node():
             # additionalValues = [getOzonValues(), getRGBValues()]
             # Important: len(self.sensors) == len(additionalValues), otherwise
             # it won't work
-            additionalValues = []
+            additionalValues = []#self.rgb.getData()#[]
             payload = np.append(payload, additionalValues)
 
 
