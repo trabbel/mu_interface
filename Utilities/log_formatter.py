@@ -30,12 +30,12 @@ class ColoredFormatter(logging.Formatter):
             result = '\n' + result
         return result
 
-def setup_logger():
+def setup_logger(name):
     logFormatter = logging.Formatter("[%(asctime)s] [%(levelname)s]: %(message)s", '%d.%m.%Y. %H:%M:%S')
     colorFormatter = ColoredFormatter("[%(asctime)s] [%(levelname)s]: %(message)s", '%d.%m.%Y. %H:%M:%S')
     rootLogger = logging.getLogger()
 
-    fileHandler = logging.FileHandler("{}.log".format(datetime.now().strftime("%d_%m_%Y-%H_%M_%S")))
+    fileHandler = logging.FileHandler(f"{name}-{datetime.now().strftime('%d_%m_%Y-%H_%M_%S')}.log")
     fileHandler.setFormatter(logFormatter)
     rootLogger.addHandler(fileHandler)
 

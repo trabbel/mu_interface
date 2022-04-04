@@ -22,14 +22,14 @@ if __name__ == "__main__":
         help='Address of the MQTT subscriber. Can be IP, localhost, *.local, etc.')
     parser.add_argument('--dir', action='store', default='/home/' + os.getenv('USER') + '/measurements/' )
     args = parser.parse_args()
-
-    setup_logger()
-    logging.info('Starting sensor node.')
     
     if args.addr == 'localhost':
         hostname = args.port.split('/')[-1]
     else:
         hostname = socket.gethostname()
+
+    setup_logger(hostname)
+    logging.info('Starting sensor node.')
 
     csv_dir = args.dir
     if csv_dir[-1] != '/':
