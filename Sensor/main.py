@@ -26,7 +26,10 @@ if __name__ == "__main__":
     setup_logger()
     logging.info('Starting sensor node.')
     
-    hostname = socket.gethostname()
+    if args.addr == 'localhost':
+        hostname = args.port.split('/')[-1]
+    else:
+        hostname = socket.gethostname()
 
     csv_dir = args.dir
     if csv_dir[-1] != '/':
