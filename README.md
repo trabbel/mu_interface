@@ -15,8 +15,8 @@ The file *data_fields.yaml* in the *Utilities* folder contains the default confi
 ## Additional Sensors
 The setup can be used with a variable number of additional sensors. To include them, only the code of the Sensor Node has to be changed, the Edge Device adapts itself to the additional sensors. Additional values will also be saved in the .csv file, exactly as the default values from the MU. To add a sensor, change two lines in the file *sensor_node.py*:
 
-- Line 31: Add the names of the additional data columns (header in the csv file) to the list self.additionalSensors. If only the MU is used, this list has to be empty.
-- Line 133: Add the data values to the list additionalValues. It is advised to write a new class for new sensors, similar to *cybres_mu.py*, and implement some kind of getData() method.
+- Line 33: Add the names of the additional data columns (header in the csv file) to the list self.additionalSensors. If only the MU is used, this list has to be empty.
+- Line 135: Add the data values to the list additionalValues. It is advised to write a new class for new sensors, similar to *cybres_mu.py*, and implement some kind of getData() method.
 
 The number of elements in both lists has to be the same, so one value correlates to exactly one data column header and vice versa.
 
