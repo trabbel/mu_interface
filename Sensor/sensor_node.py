@@ -61,11 +61,11 @@ class Sensor_Node():
                 self.csv_object = data2csv(self.file_path, file_name, self.additionalSensors)
                 last_time = current_time
 
-            # Get the next data set
+            # Get the next data set.
             next_line = self.mu.get_next()
             header, payload = self.classify_message(next_line)
 
-            # Check for invalid data
+            # Send data to Edge device via ZMQ if it's valid.
             if header != None:
                 self.pub.publish(header, self.additionalSensors, payload)
 
