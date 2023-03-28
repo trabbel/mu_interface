@@ -11,7 +11,7 @@ import datetime
 
 #http://161.53.68.176:8000/"
 url = "https://stupefied-poitras.185-23-116-208.plesk.page/api/"
-headers = {"Content-Type": "application/json", "Authorization": "insert authorization here"}
+headers = {"Content-Type": "application/json", "Authorization": "Basic dGhpc19pc190aGVfcGFzc3dvcmQ="}
 
 
 class HTTPClient(object):

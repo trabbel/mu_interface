@@ -12,12 +12,14 @@ from zmq_publisher import ZMQ_Publisher
 
 sys.path.append("..") # Adds higher directory to python modules path.
 from Utilities.data2csv import data2csv
+from Utilities.HTTP_client import HTTPClient                                    #
 
 class Sensor_Node():
 
     def __init__(self, hostname, port, baudrate, meas_interval, address, file_path):
         self.mu = Cybres_MU(port, baudrate)
         self.pub = ZMQ_Publisher(address)
+        self.client = HTTPClient(hostname, hostname)                            #
         self.hostname = hostname
         self.measurment_interval = meas_interval
         self.file_path = file_path
@@ -73,6 +75,7 @@ class Sensor_Node():
             if header[1] == 1:
                 self.msg_count += 1
                 e = self.csv_object.write2csv([self.hostname] + payload.tolist())
+                self.client.add_data(payload, self.additionalSensors)                                                   #
                 if e is not None:
                     logging.error("Writing to csv file failed with error:\n%s\n\n\
                         Continuing because this is not a fatal error.", e)

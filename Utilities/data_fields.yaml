@@ -21,8 +21,8 @@
 'VVmin_CH2': False
 'Corr_CH2' : False
 # system data
-'temp-PCB'       : True
-'temp-thermostat': False
+'temp_PCB'       : True
+'temp_thermostat': False
 # magnetometer and accelerometer data
 'mag_X': True
 'mag_Y': True
@@ -31,14 +31,14 @@
 'acc_Y': False
 'acc_Z': False
 # external sensors
-'temp-external'    : True
-'light-external'   : True
-'humidity-external': True
+'temp_external'    : True
+'light_external'   : True
+'humidity_external': True
 # biopotentials
-'differential_potential_CH1': True
-'differential_potential_CH2': True
+'differential_potential_ch1': True
+'differential_potential_ch2': True
 # more external sensors
-'RF_power_emission': True
+'rf_power_emission': True
 'transpiration'    : True
 'sap_flow'         : False
 'air_pressure'     : True

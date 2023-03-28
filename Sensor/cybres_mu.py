@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import serial
-
+import time
 
 class Cybres_MU:
 
@@ -72,3 +72,36 @@ class Cybres_MU:
         set_interval = 'mi{:05}*'.format(interval)
         self.ser.write(set_interval.encode())
 
+    def to_flash(self):
+        self.ser.write(b'sf2*')
+
+    def read_all_lines(self):
+        self.ser.write(b'f1*') #f1, mr
+        while True:
+            line = self.get_next()
+            print(line)
+
+    def read_all(self):
+        self.ser.write(b'f1*')
+        counter = 0
+        while True:
+            char = self.return_serial()
+            print(char, end='')
+            if char == 'A':
+                counter +=1
+                print(f"-----------------{counter}---------------------------")
+
+
+def main():
+    
+    mu = Cybres_MU('/dev/ttyACM0')
+    mu.set_measurement_interval(1000)
+    mu.to_flash()
+    mu.start_measurement()
+    time.sleep(180)
+    print("Now reading")
+    mu.read_all()
+
+
+if __name__ == '__main__':
+    main()
