@@ -35,7 +35,14 @@ if __name__ == "__main__":
     if csv_dir[-1] != '/':
         csv_dir += '/'
 
-    SN = Sensor_Node(hostname, args.port, args.baud, args.int, args.addr, csv_dir)
+    started = False
+    while not started:
+        try:
+            SN = Sensor_Node(hostname, args.port, args.baud, args.int, args.addr, csv_dir)
+            started = True
+        except serial.serialutil.SerialException:
+            print("Nothing connected!")
+            time.sleep(5)
     while True:
         try:
             SN.start()
@@ -51,5 +58,5 @@ if __name__ == "__main__":
                 try:
                     sys.exit(0)
                 except SystemExit:
-                    os._exit(0)                    
+                    os._exit(0)                         
             
