@@ -4,6 +4,8 @@ import re
 import socket
 import logging
 import argparse
+import serial
+import time
 from sensor_node import Sensor_Node
 
 sys.path.append("..") # Adds higher directory to python modules path.
@@ -21,10 +23,14 @@ if __name__ == "__main__":
     parser.add_argument('--addr', action='store', default='localhost',
         help='Address of the MQTT subscriber. Can be IP, localhost, *.local, etc.')
     parser.add_argument('--dir', action='store', default='/home/' + os.getenv('USER') + '/measurements/' )
+    parser.add_argument('--multi', action='store', type=bool, default=False,
+        help="If multiple MU sensors are connected to one device")
     args = parser.parse_args()
-    
+
     if args.addr == 'localhost':
         hostname = args.port.split('/')[-1]
+    elif args.multi:
+        hostname = f"{socket.gethostname()}_" + args.port.split('/')[-1]
     else:
         hostname = socket.gethostname()
 

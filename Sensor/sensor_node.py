@@ -19,7 +19,7 @@ class Sensor_Node():
     def __init__(self, hostname, port, baudrate, meas_interval, address, file_path):
         self.mu = Cybres_MU(port, baudrate)
         self.pub = ZMQ_Publisher(address)
-        self.client = HTTPClient(hostname, hostname)                            #
+        # self.client = HTTPClient(hostname, hostname)                            #
         self.hostname = hostname
         self.measurment_interval = meas_interval
         self.file_path = file_path

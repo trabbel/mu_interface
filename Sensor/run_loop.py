@@ -6,5 +6,5 @@ addr = sys.argv[2]
 filename = "main.py"
 while True:
     print("\nStarting " + filename)
-    p = Popen(f"python3 {filename} --port {port} --int 1000 --addr {addr}", shell=True)
+    p = Popen(f"python3 {filename} --port {port} --int 1000 --addr {addr} --multi", shell=True)
     p.wait()
