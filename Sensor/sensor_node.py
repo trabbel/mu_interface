@@ -12,7 +12,7 @@ from zmq_publisher import ZMQ_Publisher
 
 sys.path.append("..") # Adds higher directory to python modules path.
 from Utilities.data2csv import data2csv
-from Utilities.HTTP_client import HTTPClient                                    #
+#from Utilities.HTTP_client import HTTPClient                                    #
 
 class Sensor_Node():
 
@@ -75,7 +75,7 @@ class Sensor_Node():
             if header[1] == 1:
                 self.msg_count += 1
                 e = self.csv_object.write2csv([self.hostname] + payload.tolist())
-                self.client.add_data(payload, self.additionalSensors)                                                   #
+     #           self.client.add_data(payload, self.additionalSensors)                                                   #
                 if e is not None:
                     logging.error("Writing to csv file failed with error:\n%s\n\n\
                         Continuing because this is not a fatal error.", e)
