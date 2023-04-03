@@ -6,7 +6,7 @@ class Cybres_MU:
 
     def __init__(self, port_name, baudrate=460800):
         self.ser = serial.Serial(
-            port=port_name,
+            port=None,
             baudrate=baudrate,
             bytesize=serial.EIGHTBITS,
             parity=serial.PARITY_NONE,
@@ -14,13 +14,24 @@ class Cybres_MU:
             timeout=1,
             xonxoff=False,
             rtscts=True,
-            dsrdtr=True
+            dsrdtr=False
         )
         
-        self.ser.flushInput()
-        self.ser.flushOutput() # Just in case...
-        self.ser.close()
+        self.ser.port = port_name
+        self.ser.rts = True
+        self.ser.dtr = False
+        time.sleep(0.1)
         self.ser.open()
+        time.sleep(0.1)
+        
+        self.ser.reset_input_buffer()
+        self.ser.reset_output_buffer() # Just in case...
+        
+        time.sleep(0.1)
+        # self.ser.close()
+        # time.sleep(0.1)
+        # self.ser.open()
+        # time.sleep(0.1)
 
         self.start_char = "Z"
         
@@ -59,17 +70,17 @@ class Cybres_MU:
 
     def start_measurement(self):
         # start measurement
-        self.ser.write(b'ms*')
+        self.ser.write(b',ms*')
         
 
     def stop_measurement(self):
         # stop measurement
-        self.ser.write(b'mp*')
+        self.ser.write(b',mp*')
 
     
     def set_measurement_interval(self, interval):
         # set interval between measurements
-        set_interval = 'mi{:05}*'.format(interval)
+        set_interval = ',mi{:05}*'.format(interval)
         self.ser.write(set_interval.encode())
 
     def to_flash(self):

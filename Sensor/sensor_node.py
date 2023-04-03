@@ -39,6 +39,7 @@ class Sensor_Node():
         Start the measurements. Continue to publish over MQTT and store to csv.
         """
 
+        self.mu.ser.write(b',')
         # Measure at set interval.
         self.mu.set_measurement_interval(self.measurment_interval)
         self.mu.start_measurement()
