@@ -39,7 +39,6 @@ class Sensor_Node():
         Start the measurements. Continue to publish over MQTT and store to csv.
         """
 
-        self.mu.ser.write(b',')
         # Measure at set interval.
         self.mu.set_measurement_interval(self.measurment_interval)
         self.mu.start_measurement()
@@ -87,7 +86,6 @@ class Sensor_Node():
                 hms = (td.seconds // 3600, td.seconds // 60 % 60, td.seconds % 60)
                 duration = f"{td.days} days, {hms[0] :02}:{hms[1] :02}:{hms[2] :02} [HH:MM:SS]"
                 logging.info("I am measuring for %s and I collected %d datapoints.", duration, self.msg_count)
-
 
     def classify_message(self, mu_line):
         """
@@ -143,7 +141,6 @@ class Sensor_Node():
         header = (self.hostname, messagetype, bool(self.additionalSensors))
         return header, payload
 
-
     def transform_data(self, string_data):
         """
         Transform MU data from string to numpy array.
@@ -159,17 +156,14 @@ class Sensor_Node():
         measurements = [int(elem) for elem in split_data[1:]]
         return np.array(timestamp + measurements)
 
-
     def stop(self):
         """
         Stop the measurement and clean up.
         """
         logging.info("Measurement stopped at %s.", datetime.datetime.now().strftime("%d.%m.%Y. %H:%M:%S"))
-        _ = self.mu.return_serial()
         self.mu.stop_measurement()
         if self.csv_object is not None:
             self.csv_object.close_file()
-
 
     def shutdown(self):
         """
@@ -179,3 +173,9 @@ class Sensor_Node():
         self.mu.ser.close()
         self.pub.socket.close()
         self.pub.context.term()
+        
+    def close(self):
+        """
+        Perform clean up on forceful termination.
+        """
+        self.mu.ser.close()

@@ -61,23 +61,24 @@ class Cybres_MU:
             else:
                 line += next_char
             self.start_char = next_char
+        print(line)
         return line[:-1]
 
     def restart(self):
         # restart MU
         self.ser.write(b'sr*')
 
-
     def start_measurement(self):
         # start measurement
         self.ser.write(b',ms*')
         
-
     def stop_measurement(self):
         # stop measurement
+        # self.ser.reset_input_buffer()
+        # self.ser.reset_output_buffer()
+        # time.sleep(0.1)
         self.ser.write(b',mp*')
 
-    
     def set_measurement_interval(self, interval):
         # set interval between measurements
         set_interval = ',mi{:05}*'.format(interval)

@@ -43,28 +43,28 @@ if __name__ == "__main__":
     if csv_dir[-1] != '/':
         csv_dir += '/'
 
-    started = False
-    while not started:
-        try:
-            SN = Sensor_Node(hostname, args.port, args.baud, args.int, args.addr, csv_dir)
-            started = True
-        except serial.serialutil.SerialException:
-            print("Nothing connected!")
-            time.sleep(5)
+    connected = False
     while True:
+        while not connected:
+            try:
+                SN = Sensor_Node(hostname, args.port, args.baud, args.int, args.addr, csv_dir)
+                connected = True
+                logging.info("Connected!")
+            except serial.serialutil.SerialException:
+                print("Waiting for connection...")
+                time.sleep(5)
+
         try:
             SN.start()
         except KeyboardInterrupt:
-            logging.info("Interrupted!")
+            logging.warning("Interrupted! Wait for the program to exit.")
+            connected = False
             SN.stop()
-
-            next_command = input('\nEnter a command:\n\tnew --> start new measurement\n\texit --> exit from the script\n> ')
-            if next_command != 'new':
-                if next_command != 'exit':
-                    print("Unknow command. Exiting.")
-                SN.shutdown()
-                try:
-                    sys.exit(0)
-                except SystemExit:
-                    os._exit(0)                         
-            
+            time.sleep(1)
+            SN.shutdown()
+            time.sleep(5.0)
+            sys.exit(0)
+        except (serial.serialutil.PortNotOpenError, serial.serialutil.SerialException):
+            logging.error("Port forcefully closed!")
+            connected = False
+            SN.close()
