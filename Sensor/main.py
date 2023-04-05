@@ -52,19 +52,25 @@ if __name__ == "__main__":
                 logging.info("Connected!")
             except serial.serialutil.SerialException:
                 print("Waiting for connection...")
-                time.sleep(5)
+            time.sleep(5)
 
         try:
             SN.start()
         except KeyboardInterrupt:
-            logging.warning("Interrupted! Wait for the program to exit.")
             connected = False
             SN.stop()
             time.sleep(1)
             SN.shutdown()
             time.sleep(5.0)
+            logging.warning("Interrupted! Wait for the program to exit.")
             sys.exit(0)
-        except (serial.serialutil.PortNotOpenError, serial.serialutil.SerialException):
-            logging.error("Port forcefully closed!")
+        except serial.serialutil.SerialTimeoutException as e:
+            logging.error(f"Device not responding! - {e}")
             connected = False
+            time.sleep(1)
+            SN.close()
+        except (serial.serialutil.PortNotOpenError, serial.serialutil.SerialException):
+            logging.error("Device disconnected!")
+            connected = False
+            time.sleep(1)
             SN.close()

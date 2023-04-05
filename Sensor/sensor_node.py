@@ -167,15 +167,17 @@ class Sensor_Node():
 
     def shutdown(self):
         """
-        Perform final clean up on shutdown.
+        Restart the MU device and perform final clean up on shutdown.
         """
         self.mu.restart()
-        self.mu.ser.close()
-        self.pub.socket.close()
-        self.pub.context.term()
+        self.close()
         
     def close(self):
         """
-        Perform clean up on forceful termination.
+        Perform clean up of the sensor node.
         """
         self.mu.ser.close()
+        self.pub.socket.close()
+        self.pub.context.term()
+        if self.csv_object is not None:
+            self.csv_object.close_file()

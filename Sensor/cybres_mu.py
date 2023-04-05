@@ -66,7 +66,7 @@ class Cybres_MU:
 
     def restart(self):
         # restart MU
-        self.ser.write(b'sr*')
+        self.ser.write(b',sr*')
 
     def start_measurement(self):
         # start measurement
