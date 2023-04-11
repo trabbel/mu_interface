@@ -33,6 +33,12 @@ class Sensor_Node():
         # e.g. ['ozon-conc', 'intensity-red', 'intensity-blue']
         # self.rgb = RGB_TCS34725()
         self.additionalSensors = []#['light-red', 'light-green', 'light-blue', 'color-temperature', 'light-intensity']
+        
+    def check(self):
+        """
+        Check the communication with the device by requesting a status message.
+        """
+        self.mu.get_initial_status()
 
     def start(self):
         """
@@ -170,6 +176,7 @@ class Sensor_Node():
         Restart the MU device and perform final clean up on shutdown.
         """
         self.mu.restart()
+        time.sleep(0.5)
         self.close()
         
     def close(self):

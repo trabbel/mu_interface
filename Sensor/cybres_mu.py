@@ -12,6 +12,7 @@ class Cybres_MU:
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
             timeout=1,
+            write_timeout=1,
             xonxoff=False,
             rtscts=True,
             dsrdtr=False
@@ -63,24 +64,20 @@ class Cybres_MU:
             self.start_char = next_char
         print(line)
         return line[:-1]
+    
+    def get_initial_status(self):
+        self.ser.write(b',ss*')
 
     def restart(self):
-        # restart MU
         self.ser.write(b',sr*')
 
     def start_measurement(self):
-        # start measurement
         self.ser.write(b',ms*')
         
     def stop_measurement(self):
-        # stop measurement
-        # self.ser.reset_input_buffer()
-        # self.ser.reset_output_buffer()
-        # time.sleep(0.1)
         self.ser.write(b',mp*')
 
     def set_measurement_interval(self, interval):
-        # set interval between measurements
         set_interval = ',mi{:05}*'.format(interval)
         self.ser.write(set_interval.encode())
 
