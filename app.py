@@ -12,10 +12,14 @@ import pathlib
 import os
 
 # Global variables
-MEASUREMENT_PATH = pathlib.Path.home() / "measuerments" / "lrpi1"
-ENERGY_PATH = pathlib.Path.home() / "Dokumente" / "github"
+MEASUREMENT_PATH = pathlib.Path.home() / "measurements" #/ "measuerments" / "lrpi1"
+ENERGY_PATH = pathlib.Path.home() / "measurements" / "power_monitor"
 DISPLAY_LAST_HOURS = 2
+BOX_ID = 0
+PORT = "ACM0"
+SUBDIRECTORY = f"rockwp{BOX_ID}_tty{PORT}"
 
+print(SUBDIRECTORY)
 
 # Set up the Dash app
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.LUX])
@@ -101,6 +105,21 @@ app.layout = dbc.Container(
                                 )
                             ],
                             width=3,
+                        ),
+                        dbc.Col(
+                            [html.Label("Orange/Grey Box ID")],
+                            width=2,
+                        ),
+                        dbc.Col(
+                            [
+                                dbc.Input(
+                                    type="number",
+                                    value=BOX_ID,
+                                    min=0,
+                                    id="box_id-select",
+                                ),
+                            ],
+                            width=1,
                         ),
                         dbc.Col(
                             [html.Label("How many hours to display?")],
@@ -204,22 +223,28 @@ def toggle_collapse(n, is_open):
         Input("measurement-path", "value"),
         Input("energy-path", "value"),
         Input("sensor-select", "value"),
+        Input("box_id-select", "value"),
         Input("time-select", "value"),
     ],
 )
-def change_plot_settings(value1, value2, value3, value4):
+def change_plot_settings(value1, value2, value3, value4, value5):
     trigger = ctx.triggered_id
+    global BOX_ID, PORT, SUBDIRECTORY, MEASUREMENT_PATH, ENERGY_PATH, DISPLAY_LAST_HOURS
     if trigger == "measurement-path":
         new_path = pathlib.Path(value1)
-        global MEASUREMENT_PATH
         MEASUREMENT_PATH = new_path
     elif trigger == "energy-path":
         new_path = pathlib.Path(value2)
-        global ENERGY_PATH
         ENERGY_PATH = new_path
+    elif trigger == "sensor-select":
+        PORT = value3
+        SUBDIRECTORY = f"rockwp{BOX_ID}_tty{PORT}"
+    elif trigger == "box_id-select":
+        BOX_ID = value4
+        SUBDIRECTORY = f"rockwp{BOX_ID}_tty{PORT}"
     elif trigger == "time-select":
-        global DISPLAY_LAST_HOURS
-        DISPLAY_LAST_HOURS = value4
+        DISPLAY_LAST_HOURS = value5
+    print(SUBDIRECTORY)
     return None
 
 
@@ -230,9 +255,9 @@ def change_plot_settings(value1, value2, value3, value4):
 )
 def update_plots(n):
     # Load the updated data from the CSV file
-    file_names = os.listdir(MEASUREMENT_PATH)
+    file_names = os.listdir(MEASUREMENT_PATH / SUBDIRECTORY)
     file_names.sort()
-    df = pd.read_csv(MEASUREMENT_PATH / file_names[-1])
+    df = pd.read_csv(MEASUREMENT_PATH / SUBDIRECTORY / file_names[-1])
     df["timestamp"] = pd.to_datetime(df["timestamp"])  # convert to datetime object
 
     # Filter the data for the sliding window
@@ -247,11 +272,11 @@ def update_plots(n):
         df_window,
         x="timestamp",
         y=[
-            "temp-external",
-            "light-external",
-            "humidity-external",
-            "differential_potential_CH1",
-            "differential_potential_CH2",
+            "temp_external",
+            "light_external",
+            "humidity_external",
+            "differential_potential_ch1",
+            "differential_potential_ch2",
         ],
         title="Measurement Data",
         template="plotly",
