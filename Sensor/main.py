@@ -37,7 +37,7 @@ if __name__ == "__main__":
     else:
         hostname = socket.gethostname()
 
-    setup_logger(hostname)
+    setup_logger(hostname, level=logging.INFO)
     logging.info('Starting sensor node.')
 
     csv_dir = args.dir

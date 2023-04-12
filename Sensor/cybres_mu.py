@@ -35,16 +35,12 @@ class Cybres_MU:
         # time.sleep(0.1)
 
         self.start_char = "Z"
-        
-
-    def return_serial(self):
-        return self.ser.read(1).decode('ascii')
 
     # Finds the start of the next data set
     def find_start(self):
         start_found = False
         while not start_found:
-            char = self.return_serial()
+            char = self.ser.read(1).decode('ascii')
             if char == 'A':
                 start_found = True
         self.start_char = char
@@ -56,17 +52,17 @@ class Cybres_MU:
         if self.start_char != 'A':
             self.find_start()
         while not end_found:
-            next_char = self.return_serial()
+            next_char = self.ser.read(1).decode('ascii')
             if (next_char == 'Z'):
                 end_found = True
             else:
                 line += next_char
             self.start_char = next_char
-        print(line)
         return line[:-1]
     
     def get_initial_status(self):
         self.ser.write(b',ss*')
+        return self._get_response(sleep_time=0.5)
 
     def restart(self):
         self.ser.write(b',sr*')
@@ -80,6 +76,7 @@ class Cybres_MU:
     def set_measurement_interval(self, interval):
         set_interval = ',mi{:05}*'.format(interval)
         self.ser.write(set_interval.encode())
+        return self._get_response(sleep_time=0.5)
 
     def to_flash(self):
         self.ser.write(b'sf2*')
@@ -99,6 +96,13 @@ class Cybres_MU:
             if char == 'A':
                 counter +=1
                 print(f"-----------------{counter}---------------------------")
+
+    def _get_response(self, sleep_time=0.1):
+        time.sleep(sleep_time)
+        response = ""
+        while self.ser.in_waiting:
+            response += self.ser.read(1).decode('ascii')
+        return response
 
 
 def main():

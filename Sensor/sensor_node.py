@@ -38,7 +38,8 @@ class Sensor_Node():
         """
         Check the communication with the device by requesting a status message.
         """
-        self.mu.get_initial_status()
+        response = self.mu.get_initial_status()
+        logging.debug(response)
 
     def start(self):
         """
@@ -46,7 +47,8 @@ class Sensor_Node():
         """
 
         # Measure at set interval.
-        self.mu.set_measurement_interval(self.measurment_interval)
+        response = self.mu.set_measurement_interval(self.measurment_interval)
+        logging.debug(response)
         self.mu.start_measurement()
 
         # Record the starting time and notify the user.
