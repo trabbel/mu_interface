@@ -9,6 +9,11 @@ pip3 install pyserial numpy zmq pyyaml
 ```
 Note: Both the packages *zmq* and *pyzmq* work.
 
+To use the real-time plottinf with *app.py*, the following additional packages are needed:
+```bash
+pip3 install pandas dash dash-bootstrap-components
+```
+
 ## Default Data Fields
 The file *data_fields.yaml* in the *Utilities* folder contains the default configuration for data fields from the MU. It can be changed to include more or less MU data fields.
 
@@ -39,4 +44,7 @@ ZMQ allows to send custom message formats using [multipart messages](http://api.
 The third header entry is a boolean flag that indicates if additional sensors other than the MU are used. If the flag is True, an additional message part between header and payload is sent which contains the names of the additional data columns for saving in the .csv file.
 
 The measurement data array consists of a timestamp generated on the Sensor Node RPi, followed by sensor metadata (MU ID, MU MM, sensor hostname) and the measured data. If additional sensors are used, the additional values are attached to the measured data array.
+
+## Real-Time plot
+Running *app.py* starts an interactive dashboard on a local port (default: http://127.0.0.1:8050/). Open this port in a any browser to observe the running experiment.
 
