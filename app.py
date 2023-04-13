@@ -13,10 +13,10 @@ import os
 
 # Global variables
 MEASUREMENT_PATH = pathlib.Path.home() / "measurements" #/ "measuerments" / "lrpi1"
-ENERGY_PATH = pathlib.Path.home() / "measurements" / "power_monitor"
 DISPLAY_LAST_HOURS = 2
 BOX_ID = 0
 PORT = "ACM0"
+ENERGY_PATH = pathlib.Path.home() / "measurements" / f"rockwp{BOX_ID}energy"
 SUBDIRECTORY = f"rockwp{BOX_ID}_tty{PORT}"
 
 print(SUBDIRECTORY)
@@ -242,6 +242,7 @@ def change_plot_settings(value1, value2, value3, value4, value5):
     elif trigger == "box_id-select":
         BOX_ID = value4
         SUBDIRECTORY = f"rockwp{BOX_ID}_tty{PORT}"
+        ENERGY_PATH = pathlib.Path.home() / "measurements" / f"rockwp{BOX_ID}energy"
     elif trigger == "time-select":
         DISPLAY_LAST_HOURS = value5
     print(SUBDIRECTORY)
@@ -261,12 +262,12 @@ def update_plots(n):
     df["timestamp"] = pd.to_datetime(df["timestamp"])  # convert to datetime object
 
     # Filter the data for the sliding window
-    # df_window = df.loc[df['timestamp'] > pd.Timestamp.now() - pd.Timedelta(hours=2)]
-    df_window = df.loc[
-        df["timestamp"]
-        > pd.Timestamp(year=2021, month=5, day=31, hour=14, minute=30)
-        - pd.Timedelta(hours=DISPLAY_LAST_HOURS)
-    ]
+    df_window = df.loc[df['timestamp'] > pd.Timestamp.now() - pd.Timedelta(hours=2)]
+    #df_window = df.loc[
+    #    df["timestamp"]
+    #    > pd.Timestamp(year=2021, month=5, day=31, hour=14, minute=30)
+    #    - pd.Timedelta(hours=DISPLAY_LAST_HOURS)
+    #]
     # Create the first plot
     fig1 = px.line(
         df_window,
@@ -285,22 +286,20 @@ def update_plots(n):
 
     # Create the second plot
     fig2 = px.line(
-        df, x="timestamp", y="temp-external", title="Placeholder for MU/Pi input"
+        df, x="timestamp", y="temp_external", title="Placeholder for MU/Pi input"
     )
     fig2["layout"]["uirevision"] = "2"
 
     # Create the third plot
-    df = pd.read_csv(ENERGY_PATH / "data.csv")
-    df["time"] = pd.to_datetime(df["time"])  # convert to datetime object
-    # df_window = df.loc[df['timestamp'] > pd.Timestamp.now() - pd.Timedelta(hours=2)]
-    df_window = df.loc[
-        df["time"]
-        > pd.Timestamp(year=2023, month=4, day=6, hour=2)
-        - pd.Timedelta(hours=DISPLAY_LAST_HOURS)
-    ]
+    # Load the updated data from the CSV file
+    file_names = os.listdir(ENERGY_PATH)
+    file_names.sort()
+    df = pd.read_csv(ENERGY_PATH / file_names[-1])
+    df["timestamp"] = pd.to_datetime(df["timestamp"])  # convert to datetime object
+    df_window = df.loc[df['timestamp'] > pd.Timestamp.now() - pd.Timedelta(hours=2)]
 
     fig3 = px.line(
-        df_window, x="time", y=["value1", "value2"], title="Energy Consumption"
+        df_window, x="timestamp", y = ["bus_voltage_solar","current_solar","bus_voltage_battery","current_battery"]#x="time", y=["value1", "value2"], title="Energy Consumption"
     )
     fig3["layout"]["uirevision"] = "3"
     # Return the updated figures
