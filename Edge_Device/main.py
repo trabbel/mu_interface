@@ -15,7 +15,7 @@ if __name__ == "__main__":
     parser.add_argument('--dir', action='store', default='/home/' + os.getenv('USER') + '/measurements/' )
     args = parser.parse_args()
 
-    setup_logger()
+    setup_logger("rock")
     logging.info("Starting edge node.")
 
     csv_dir = args.dir
