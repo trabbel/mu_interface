@@ -180,6 +180,16 @@ app.layout = dbc.Container(
                             debounce=True,
                             className="mb-3",
                         ),
+                        html.Label("Change measurement frequency (in ms)"),
+                        dbc.Input(
+                            type="number",
+                            id="orange_box-freq",
+                            value="10000",
+                            min="100",
+                            max="10000000",
+                            debounce=True,
+                            className="mb-3",
+                        ),
                         dbc.Button("Shutdown", id="orange_box-shutdown", outline=True, color="danger", className="me-1"),
                         dbc.Button("Reboot", id="orange_box-reboot", outline=True, color="danger", className="me-1"),
                     ],
@@ -223,6 +233,15 @@ def change_IP(value):
     global SOCKET
     SOCKET = socket
     print(SOCKET)
+    return False
+
+# Callback for change of measurement frequency
+@app.callback(
+    Output("orange_box-freq", "invalid"),
+    [Input("orange_box-freq", "value")],
+)
+def change_freq(value):
+    SOCKET.send_string(f"freq {value}", flags=0)
     return False
 
 # Callback for shutdown button

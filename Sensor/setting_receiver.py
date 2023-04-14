@@ -8,8 +8,11 @@ socket.subscribe("")
 
 while True:
     command = socket.recv_string(flags=0)
+    command = command.split()
     print(f"received: {command}")
-    if command == "shutdown":
+    if command[0] == "shutdown":
         p = Popen("sudo shutdown -h now", shell=True)
-    elif command == "reboot":
+    elif command[0] == "reboot":
         p = Popen("sudo shutdown -r now", shell=True)
+    elif command [0] == "freq":
+        print(command[1])
