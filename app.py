@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 import pathlib
 
 import os
+import zmq
 
 # Global variables
 MEASUREMENT_PATH = pathlib.Path.home() / "measurements" #/ "measuerments" / "lrpi1"
@@ -18,6 +19,8 @@ BOX_ID = 0
 PORT = "ACM0"
 ENERGY_PATH = pathlib.Path.home() / "measurements" / f"rockwp{BOX_ID}energy"
 SUBDIRECTORY = f"rockwp{BOX_ID}_tty{PORT}"
+context = zmq.Context()
+SOCKET = context.socket(zmq.PUB)
 
 print(SUBDIRECTORY)
 
@@ -149,7 +152,7 @@ app.layout = dbc.Container(
                 dbc.Col(
                     [
                         dcc.Graph(
-                            id="plot1",
+                            id="mu_plot",
                             config={
                                 "displaylogo": False,
                                 "edits": {"legendPosition": True},
@@ -167,22 +170,24 @@ app.layout = dbc.Container(
             [
                 dbc.Col(
                     [
-                        dcc.Graph(
-                            id="plot2",
-                            config={
-                                "displaylogo": False,
-                                "edits": {"legendPosition": True},
-                                "modeBarButtonsToRemove": ["autoScale2d"],
-                                "scrollZoom": True,
-                            },
-                        )
+                        html.Hr(),
+                        html.H3("Orange Box Settings"),
+                        html.Label("IP address of Orange Box"),
+                        dbc.Input(
+                            type="text",
+                            id="orange_box-ip",
+                            value="172.16.0.197",
+                            debounce=True,
+                            className="mb-3",
+                        ),
+                        dbc.Button("Shutdown", id="orange_box-shutdown", outline=True, color="danger", className="me-1"),
                     ],
-                    width=6,
+                    width=4,
                 ),
                 dbc.Col(
                     [
                         dcc.Graph(
-                            id="plot3",
+                            id="energy_plot",
                             config={
                                 "displaylogo": False,
                                 "edits": {"legendPosition": True},
@@ -191,7 +196,7 @@ app.layout = dbc.Container(
                             },
                         )
                     ],
-                    width=6,
+                    width=8,
                 ),
             ],
             style={"margin-top": "20px"},
@@ -204,6 +209,29 @@ app.layout = dbc.Container(
     ],
     fluid=True,
 )
+
+# Callback for changing IP
+@app.callback(
+    Output("orange_box-ip", "invalid"),
+    [Input("orange_box-ip", "value")],
+)
+def change_IP(value):
+    context = zmq.Context()
+    socket = context.socket(zmq.PUB)
+    socket.connect(f"tcp://{value}:5557")
+    global SOCKET
+    SOCKET = socket
+    print(SOCKET)
+    return False
+
+# Callback for shutdown button
+@app.callback(
+    Output("orange_box-shutdown", "color"),
+    [Input("orange_box-shutdown", "n_clicks")],
+)
+def shutdown(n):
+    SOCKET.send_string("hello", flags=0)
+    return "success" if n%2==0 else "danger"
 
 
 # Callback to toggle settings collaps
@@ -251,7 +279,7 @@ def change_plot_settings(value1, value2, value3, value4, value5):
 
 # Callback to update live plots
 @app.callback(
-    [Output("plot1", "figure"), Output("plot2", "figure"), Output("plot3", "figure")],
+    [Output("mu_plot", "figure"), Output("energy_plot", "figure")],
     [Input("interval-component", "n_intervals")],
 )
 def update_plots(n):
@@ -284,12 +312,6 @@ def update_plots(n):
     )
     fig1["layout"]["uirevision"] = "1"
 
-    # Create the second plot
-    fig2 = px.line(
-        df, x="timestamp", y="temp_external", title="Placeholder for MU/Pi input"
-    )
-    fig2["layout"]["uirevision"] = "2"
-
     # Create the third plot
     # Load the updated data from the CSV file
     file_names = os.listdir(ENERGY_PATH)
@@ -303,7 +325,7 @@ def update_plots(n):
     )
     fig3["layout"]["uirevision"] = "3"
     # Return the updated figures
-    return fig1, fig2, fig3
+    return fig1, fig3
 
 
 # Run the app

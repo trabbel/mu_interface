@@ -26,7 +26,7 @@ if __name__ == "__main__":
         help="Address of the MQTT subscriber. Can be IP, localhost, *.local, etc.")
     parser.add_argument('--dir', action='store', default='/home/' + os.getenv('USER') + '/measurements/',
         help="Directory where measurement data is saved.")
-    parser.add_argument('--multi', action='store', type=bool, default=False,
+    parser.add_argument('--multi', action='store', type=bool, default=True,
         help="Flag specifying that multiple MU sensors are connected to one sensor node.")
     args = parser.parse_args()
 
