@@ -181,6 +181,7 @@ app.layout = dbc.Container(
                             className="mb-3",
                         ),
                         dbc.Button("Shutdown", id="orange_box-shutdown", outline=True, color="danger", className="me-1"),
+                        dbc.Button("Reboot", id="orange_box-reboot", outline=True, color="danger", className="me-1"),
                     ],
                     width=4,
                 ),
@@ -230,7 +231,17 @@ def change_IP(value):
     [Input("orange_box-shutdown", "n_clicks")],
 )
 def shutdown(n):
-    SOCKET.send_string("hello", flags=0)
+    SOCKET.send_string("shutdown", flags=0)
+    return "success" if n%2==0 else "danger"
+
+
+# Callback for reboot button
+@app.callback(
+    Output("orange_box-reboot", "color"),
+    [Input("orange_box-reboot", "n_clicks")],
+)
+def shutdown(n):
+    SOCKET.send_string("reboot", flags=0)
     return "success" if n%2==0 else "danger"
 
 
