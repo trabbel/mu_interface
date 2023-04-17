@@ -241,6 +241,8 @@ def change_IP(value):
     [Input("orange_box-freq", "value")],
 )
 def change_freq(value):
+    if value is None:
+        return True
     SOCKET.send_string(f"freq {value}", flags=0)
     return False
 
@@ -250,6 +252,8 @@ def change_freq(value):
     [Input("orange_box-shutdown", "n_clicks")],
 )
 def shutdown(n):
+    if n is None:
+        raise dash.exceptions.PreventUpdate
     SOCKET.send_string("shutdown", flags=0)
     return "success" if n%2==0 else "danger"
 
@@ -260,6 +264,8 @@ def shutdown(n):
     [Input("orange_box-reboot", "n_clicks")],
 )
 def shutdown(n):
+    if n is None:
+        raise dash.exceptions.PreventUpdate
     SOCKET.send_string("reboot", flags=0)
     return "success" if n%2==0 else "danger"
 
