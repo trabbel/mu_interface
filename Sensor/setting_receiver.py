@@ -15,4 +15,4 @@ while True:
     elif command[0] == "reboot":
         p = Popen("sudo shutdown -r now", shell=True)
     elif command [0] == "freq":
-        print(command[1])
+        p = Popen (f"sed -i '/export INTERVAL/c\export INTERVAL={command[1]}' ~/.bashrc")
