@@ -24,7 +24,7 @@ class data2csv:
         else:
 
             if config_file is None:
-                config_file = Path(__file__).parent.absolute() / "data_fields.yaml"
+                config_file = Path(__file__).parent.absolute() / "config/default_data_fields.yaml"
 
             with open(config_file) as stream:
                 config = yaml.safe_load(stream)

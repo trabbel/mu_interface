@@ -26,9 +26,15 @@ if __name__ == "__main__":
         help="Address of the MQTT subscriber. Can be IP, localhost, *.local, etc.")
     parser.add_argument('--dir', action='store', default='/home/' + os.getenv('USER') + '/measurements/',
         help="Directory where measurement data is saved.")
-    parser.add_argument('--multi', action='store', type=bool, default=True,
+    parser.add_argument('--multi', action='store_true',
         help="Flag specifying that multiple MU sensors are connected to one sensor node.")
     args = parser.parse_args()
+    
+    csv_dir = args.dir
+    if csv_dir[-1] != '/':
+        csv_dir += '/'
+    if args.multi:
+        csv_dir += args.port.split('/')[-1] + '/'
 
     if args.addr == 'localhost':
         hostname = args.port.split('/')[-1]
@@ -39,11 +45,7 @@ if __name__ == "__main__":
 
     setup_logger(hostname, level=logging.INFO)
     logging.info('Starting sensor node.')
-
-    csv_dir = args.dir
-    if csv_dir[-1] != '/':
-        csv_dir += '/'
-        
+    
     baud = args.baud
 
     connected = False

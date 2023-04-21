@@ -18,13 +18,15 @@ HOW TO USE:
 import yaml
 import mysql.connector
 from mysql.connector import Error
+from pathlib import Path
 
 
 
 class MySQL_client:
 
     def __init__(self):
-        with open("config.yaml", "r") as ymlfile:
+        config_file = Path(__file__).parent.absolute() / "config/mysql_config.yaml"
+        with open(config_file, "r") as ymlfile:
             cfg = yaml.full_load(ymlfile)
         self.host_name = str(cfg["mysql"]["host"])
         self.user_name = str(cfg["mysql"]["user"])
