@@ -54,6 +54,9 @@ class Edge_Device():
                 self.save_data(sender, additionalSensors, payload)
                 logging.info("Node %s reporting: MU ID is %s, current measurement mode is: %s",
                              sender, payload[3], payload[2])
+            # Energy measurement
+            elif msg_type == 3:
+                self.save_data(sender, "energy", payload)
             # Unknown
             else:
                 logging.warning("Unknown message type: %d. Payload:\n%s", msg_type, payload)
@@ -85,11 +88,17 @@ class Edge_Device():
         # Create a new csv file if it doesn't exist for this sender.
         if sender not in self.csv_objects:
             file_name = f"{sender}_{datetime.datetime.now().strftime('%Y_%m_%d-%H_%M_%S')}.csv"
-            self.csv_objects[sender] = data2csv(self.file_path + sender + '/', file_name, additionalSensors)
+            if additionalSensors == "energy":
+                self.csv_objects[sender] = data2csv(self.file_path + sender + '/' + "energy" + '/', file_name, additionalSensors)
+            else:
+                self.csv_objects[sender] = data2csv(self.file_path + sender[:-5] + '/' + sender[-4:] + '/', file_name, additionalSensors)
             logging.info("Created file: %s", file_name)
 
         # Read and format the data.
-        data = [sender] + payload.tolist()
+        if additionalSensors == "energy":
+            data = payload.tolist()
+        else:
+            data = [sender] + payload.tolist()
         logging.debug(" \n%s", data)
 
 
