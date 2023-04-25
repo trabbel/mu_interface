@@ -89,9 +89,9 @@ class Edge_Device():
         if sender not in self.csv_objects:
             file_name = f"{sender}_{datetime.datetime.now().strftime('%Y_%m_%d-%H_%M_%S')}.csv"
             if additionalSensors == "energy":
-                self.csv_objects[sender] = data2csv(self.file_path + sender + "energy" + '/', file_name, additionalSensors)
+                self.csv_objects[sender] = data2csv(self.file_path + sender + '/' + "energy" + '/', file_name, additionalSensors)
             else:
-                self.csv_objects[sender] = data2csv(self.file_path + sender + '/', file_name, additionalSensors)
+                self.csv_objects[sender] = data2csv(self.file_path + sender[:-5] + '/' + sender[-4:] + '/', file_name, additionalSensors)
             logging.info("Created file: %s", file_name)
 
         # Read and format the data.
