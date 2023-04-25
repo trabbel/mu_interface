@@ -18,13 +18,13 @@ class data2csv:
         self.csvwriter = csv.writer(self.csvfile)
 
         if additionalSensors == "energy":
-            header = ['timestamp', "bus_voltage_solar", "current_solar", "bus_voltage_battery", "current_battery"]
+            header = ['timestamp', "bus_voltage_solar", "current_solar", "bus_voltage_battery", "current_battery", "ip0", "ip1", "ip2", "ip3"]
             self.csvwriter.writerow(header)
             self.csvfile.close()
         else:
 
             if config_file is None:
-                config_file = Path(__file__).parent.absolute() / "config/default_data_fields.yaml"
+                config_file = Path(__file__).parent.absolute() / "data_fields.yaml"
 
             with open(config_file) as stream:
                 config = yaml.safe_load(stream)
