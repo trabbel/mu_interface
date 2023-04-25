@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import csv
 import yaml
 from datetime import datetime
@@ -9,12 +10,12 @@ class data2csv:
 
     def __init__(self, file_path, file_name, additionalSensors, config_file=None):
 
-        Path(file_path).mkdir(parents=True, exist_ok=True) # make new directory
-        self.file_path = file_path
+        self.file_path = Path(file_path)
+        self.file_path.mkdir(parents=True, exist_ok=True) # make new directory
         self.file_name = file_name
         self.additionalSensors = additionalSensors
 
-        self.csvfile = open(file_path + file_name, 'w')
+        self.csvfile = open(self.file_path / self.file_name, 'w')
         self.csvwriter = csv.writer(self.csvfile)
 
         if additionalSensors == "energy":
@@ -22,7 +23,6 @@ class data2csv:
             self.csvwriter.writerow(header)
             self.csvfile.close()
         else:
-
             if config_file is None:
                 config_file = Path(__file__).parent.absolute() / "data_fields.yaml"
 
@@ -39,6 +39,16 @@ class data2csv:
 
     def close_file(self):
         self.csvfile.close()
+        
+    def fix_ownership(self):
+        """Change the owner of the file to SUDO_UID"""
+        uid = os.environ.get('SUDO_UID')
+        gid = os.environ.get('SUDO_GID')
+        if uid is not None:
+            full_path = self.file_path / self.file_name
+            os.chown(full_path, int(uid), int(gid))
+            for p in list(full_path.parents)[:-3]:
+                os.chown(p, int(uid), int(gid))
 
     def write2csv(self, data):
         try:
@@ -50,7 +60,7 @@ class data2csv:
                 filtered_data = [data[i] for i in self.filter]
 
             data4csv = [timestamp] + filtered_data
-            self.csvfile = open(self.file_path + self.file_name, 'a')
+            self.csvfile = open(self.file_path / self.file_name, 'a')
             self.csvwriter = csv.writer(self.csvfile)
             self.csvwriter.writerow(data4csv)
             self.csvfile.close()
