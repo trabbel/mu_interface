@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 import zmq
+import socket
 import numpy as np
 
 class ZMQ_Subscriber():
 
     def __init__(self):
+        ipaddr = socket.gethostbyname(socket.gethostname()) 
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.SUB)
-        self.socket.bind("tcp://*:5556")
+        self.socket.bind(f"tcp://{ipaddr}:5556")
         self.socket.subscribe("")
-
 
     # receive a custom multipart message
     # refer to readme for more information

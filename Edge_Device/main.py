@@ -12,15 +12,13 @@ from Utilities.log_formatter import ColoredFormatter, setup_logger
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Arguments for the sensor node.")
-    parser.add_argument('--dir', action='store', default='/home/' + os.getenv('USER') + '/measurements/' )
+    parser.add_argument('--dir', action='store', default=Path.home() / 'measurements')
     args = parser.parse_args()
 
     setup_logger("rock")
     logging.info("Starting edge node.")
 
-    csv_dir = args.dir
-    if csv_dir[-1] != '/':
-        csv_dir += '/'
+    csv_dir = Path(args.dir)
 
     ED = Edge_Device(csv_dir)
     while True:
@@ -37,4 +35,4 @@ if __name__ == "__main__":
                 try:
                     sys.exit(0)
                 except SystemExit:
-                    os._exit(0)    
+                    os._exit(0)

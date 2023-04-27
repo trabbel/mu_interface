@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-import sys, os
-import re
+import sys
 import socket
 import logging
 import argparse
 import serial
 import time
+from pathlib import Path
+
 from sensor_node import Sensor_Node
 
 sys.path.append("..") # Adds higher directory to python modules path.
@@ -30,11 +31,9 @@ if __name__ == "__main__":
         help="Flag specifying that multiple MU sensors are connected to one sensor node.")
     args = parser.parse_args()
     
-    csv_dir = args.dir
-    if csv_dir[-1] != '/':
-        csv_dir += '/'
+    csv_dir = Path(args.dir)
     if args.multi:
-        csv_dir += args.port.split('/')[-1] + '/'
+        csv_dir /= args.port.split('/')[-1]
 
     if args.addr == 'localhost':
         hostname = args.port.split('/')[-1]

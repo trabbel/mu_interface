@@ -73,7 +73,6 @@ class Edge_Device():
                              duration, "\n".join([f"{key}: {val}" for key, val in self.msg_counter.items()]))
                 last_info_time = current_time
 
-
             # Create new csv files at midnight.
             if current_time.hour in {0, 12} and current_time.hour != last_csv_time.hour:
                 logging.info("Creating new csv files.")
@@ -89,9 +88,9 @@ class Edge_Device():
         if sender not in self.csv_objects:
             file_name = f"{sender}_{datetime.datetime.now().strftime('%Y_%m_%d-%H_%M_%S')}.csv"
             if additionalSensors == "energy":
-                self.csv_objects[sender] = data2csv(self.file_path + sender + '/' + "energy" + '/', file_name, additionalSensors)
+                self.csv_objects[sender] = data2csv(self.file_path / sender / "energy", file_name, additionalSensors)
             else:
-                self.csv_objects[sender] = data2csv(self.file_path + sender[:-5] + '/' + sender[-4:] + '/', file_name, additionalSensors)
+                self.csv_objects[sender] = data2csv(self.file_path / sender[:-5] / sender[-4:], file_name, additionalSensors)
             logging.info("Created file: %s", file_name)
 
         # Read and format the data.
