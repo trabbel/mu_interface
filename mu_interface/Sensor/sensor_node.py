@@ -9,10 +9,8 @@ import numpy as np
 from cybres_mu import Cybres_MU
 # from Additional_Sensors.rgbtcs34725 import RGB_TCS34725
 from zmq_publisher import ZMQ_Publisher
-
-sys.path.append("..") # Adds higher directory to python modules path.
-from Utilities.data2csv import data2csv
-#from Utilities.HTTP_client import HTTPClient                                    #
+from mu_interface.Utilities.data2csv import data2csv
+#from mu_interface.Utilities.HTTP_client import HTTPClient                                    #
 
 class Sensor_Node():
 

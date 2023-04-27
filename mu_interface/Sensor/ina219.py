@@ -12,8 +12,7 @@ import numpy as np
 from adafruit_ina219 import ADCResolution, BusVoltageRange, INA219
 
 from zmq_publisher import ZMQ_Publisher
-sys.path.append("..") # Adds higher directory to python modules path.
-from Utilities.data2csv import data2csv
+from mu_interface.Utilities.data2csv import data2csv
 
 
 ## Parse arguments.

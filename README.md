@@ -3,7 +3,7 @@
 This is the planned structure for the WatchPlant data collection setup. The scripts in the folder Edge_Device will run on one RPi to collect data, the scripts in the folder Sensor will run on RPis connected to a Cybres MU. *Utilities* are required by all RPis. On both the Edge Device and Sensor is one *main.py* file. They are the starting point and the only files that must be executed.
 
 ## Needed software
-To run the scripts, a python 3 installation is needed. Also pip install the following packages: 
+To run the scripts, a python 3 installation is needed. It is recommended to use a virtual environment (for example `venv`). You need to install the following packages: 
 ```bash
 pip3 install pyserial numpy zmq pyyaml
 ```
@@ -12,6 +12,11 @@ Note: Both the packages *zmq* and *pyzmq* work.
 To use the real-time plottinf with *app.py*, the following additional packages are needed:
 ```bash
 pip3 install pandas dash dash-bootstrap-components
+```
+
+**IMPORTANT**: In order for imports to work properly, this package needs to be installed. Navigate to the root of the repository (.../**mu_interface**/mu_interface/...) and run:
+```bash
+pip3 install -e .
 ```
 
 ## Default Data Fields

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import zmq
-import numpy as np
 
 class ZMQ_Publisher():
 

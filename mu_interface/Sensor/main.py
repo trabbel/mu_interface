@@ -8,9 +8,7 @@ import time
 from pathlib import Path
 
 from sensor_node import Sensor_Node
-
-sys.path.append("..") # Adds higher directory to python modules path.
-from Utilities.log_formatter import ColoredFormatter, setup_logger
+from mu_interface.Utilities.log_formatter import setup_logger
 
 
 if __name__ == "__main__":

@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
-import sys
 import logging
 import datetime
-import numpy as np
 from collections import Counter
 
 from zmq_subscriber import ZMQ_Subscriber
-
-sys.path.append("..") # Adds higher directory to python modules path.
-from Utilities.data2csv import data2csv
+from mu_interface.Utilities.data2csv import data2csv
 
 class Edge_Device():
 

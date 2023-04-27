@@ -15,7 +15,7 @@ class data2csv:
         self.file_name = file_name
         self.additionalSensors = additionalSensors
 
-        self.csvfile = open(self.file_path / self.file_name, 'w')
+        self.csvfile = open(self.file_path / self.file_name, 'w', newline='')
         self.csvwriter = csv.writer(self.csvfile)
 
         if additionalSensors == "energy":
@@ -60,7 +60,7 @@ class data2csv:
                 filtered_data = [data[i] for i in self.filter]
 
             data4csv = [timestamp] + filtered_data
-            self.csvfile = open(self.file_path / self.file_name, 'a')
+            self.csvfile = open(self.file_path / self.file_name, 'a', newline='')
             self.csvwriter = csv.writer(self.csvfile)
             self.csvwriter.writerow(data4csv)
             self.csvfile.close()
