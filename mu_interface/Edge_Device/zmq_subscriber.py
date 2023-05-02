@@ -3,10 +3,12 @@ import zmq
 import socket
 import numpy as np
 
+from mu_interface.Utilities.utils import get_ip_address
+
 class ZMQ_Subscriber():
 
     def __init__(self):
-        ipaddr = socket.gethostbyname(socket.gethostname()) 
+        ipaddr = get_ip_address()
         self.context = zmq.Context()
         self.socket = self.context.socket(zmq.SUB)
         self.socket.bind(f"tcp://{ipaddr}:5556")

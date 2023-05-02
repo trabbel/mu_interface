@@ -13,6 +13,7 @@ from adafruit_ina219 import ADCResolution, BusVoltageRange, INA219
 
 from zmq_publisher import ZMQ_Publisher
 from mu_interface.Utilities.data2csv import data2csv
+from mu_interface.Utilities.utils import get_ip_address
 
 
 ## Parse arguments.
@@ -26,8 +27,7 @@ parser.add_argument('--dir', action='store', default='/home/' + os.getenv('USER'
 args = parser.parse_args()
 
 ## Set up ZeroMQ
-hostname = socket.gethostname()
-ipaddr = socket.gethostbyname(hostname)
+ipaddr = get_ip_address()
 print(f'IP: {ipaddr}')
 ipaddr = [int(x) for x in ipaddr.split('.')]
 
