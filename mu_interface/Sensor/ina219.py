@@ -27,11 +27,12 @@ parser.add_argument('--dir', action='store', default='/home/' + os.getenv('USER'
 args = parser.parse_args()
 
 ## Set up ZeroMQ
+hostname = socket.gethostname()
 ipaddr = get_ip_address()
 print(f'IP: {ipaddr}')
 ipaddr = [int(x) for x in ipaddr.split('.')]
 
-header = (socket.gethostname(), 3, False)
+header = (hostname, 3, False)
 pub = ZMQ_Publisher(args.addr)
 
 ## Set up I2C sensors. 
