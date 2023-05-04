@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import copy
 import logging
 import datetime
 from collections import Counter
@@ -75,7 +76,9 @@ class Edge_Device():
                 for node in self.csv_objects:
                     self.csv_objects[node].close_file()
                     file_name = f"{node}_{current_time.strftime('%Y_%m_%d-%H_%M_%S')}.csv"
-                    self.csv_objects[node] = data2csv(self.file_path  + node + '/', file_name, additionalSensors)
+                    file_path = self.csv_objects[node].file_path
+                    additionalSensors = copy.deepcopy(self.csv_objects[node].additionalSensors)
+                    self.csv_objects[sender] = data2csv(file_path, file_name, additionalSensors)
                 last_csv_time = current_time
 
 
